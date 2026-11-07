@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sargotsav Check-in</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141414">
+<link rel="icon" href="data:image/webp;base64,__LOGO__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat:wght@700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+<style>
+/* Check-in desk: one-handed, phone first. Ink header, paper body, a big camera window,
+   and one result card that says clearly: present, already in, or not found. */
+:root{
+  --paper:#FFF8EC; --desk:#fffdf8; --ink:#141414; --muted:#6b6358; --line:#e6dac6; --line2:#d6c7ae;
+  --orange:#F57A22; --coral:#F14F3A; --green:#308E40; --teal:#2B7D60; --blue:#4581CB; --indigo:#4F5BA3; --mint:#9DD1C0; --magenta:#E2246E; --yellow:#FFC23A;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif; --hand:"Caveat","Comic Sans MS",cursive;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+.stripe{display:grid;grid-template-columns:repeat(5,1fr);height:8px}
+.stripe i:nth-child(1){background:var(--orange)}.stripe i:nth-child(2){background:var(--green)}.stripe i:nth-child(3){background:var(--blue)}.stripe i:nth-child(4){background:var(--indigo)}.stripe i:nth-child(5){background:var(--magenta)}
+
+.btn{border:2px solid var(--ink);border-radius:14px;padding:10px 18px;font-weight:800;background:var(--ink);color:#fff;display:inline-flex;gap:8px;align-items:center;justify-content:center;min-height:48px;text-decoration:none;white-space:nowrap}
+.btn.block{width:100%}
+.btn.ghost{background:var(--desk);color:var(--ink)}
+.btn.go{background:var(--green);border-color:var(--green);font-size:1.1rem;min-height:58px}
+.btn.yellow{background:var(--yellow);color:var(--ink)}
+.btn.sm{min-height:38px;padding:6px 12px;font-size:.88rem;border-radius:11px;font-weight:700}
+.btn[disabled]{opacity:.55;cursor:wait}
+.alert{border-radius:12px;padding:10px 12px;font-weight:600;font-size:.92rem}
+.alert.err{background:#fde8e5;color:#9d2a1c}
+.fine{font-size:.82rem;color:var(--muted);margin:0}
+
+/* gate */
+.gate{min-height:100vh;display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
+.gate-card{width:min(420px,100%);background:var(--desk);border:2px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:8px 8px 0 var(--ink)}
+.gate-body{padding:24px;display:grid;gap:16px}
+.gate-body img{width:110px;height:auto}
+.gate-body h1{margin:0;font-size:1.6rem;font-weight:800;letter-spacing:-.01em;line-height:1.1}
+.gate-body p{margin:0;color:var(--muted);font-size:.92rem}
+.field{display:grid;gap:5px}
+.field label{font-weight:700;font-size:.88rem}
+.field input,.search{border:2px solid var(--line2);border-radius:12px;padding:10px 12px;background:var(--paper);min-height:48px;width:100%;font-size:1rem}
+.field input:focus,.search:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px var(--yellow)}
+
+/* app */
+.top{background:var(--ink);color:#f3ece0;position:sticky;top:0;z-index:5}
+.top .bar{max-width:640px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}
+.top .brand{display:grid;line-height:1.05}
+.top .brand b{font-size:1.05rem;font-weight:800}
+.top .brand span{font-family:var(--hand);color:var(--yellow);font-size:1.2rem}
+.top .count{margin-left:auto;text-align:right;line-height:1.1}
+.top .count b{font-size:1.35rem;font-weight:800;color:#fff}
+.top .count span{display:block;font-size:.74rem;color:#b7ad9d}
+.top .count em{font-style:normal;color:#8c8475;font-weight:700}
+.top .count em i{font-style:normal}
+.wrapx{max-width:640px;margin:0 auto;padding:16px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+
+.cam{position:relative;border-radius:22px;overflow:hidden;background:#1d1b18;aspect-ratio:1/1;max-height:62vh;width:100%;border:2px solid var(--ink)}
+.cam video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cam .frame{position:absolute;inset:16%;border-radius:20px;box-shadow:0 0 0 999px rgba(20,20,20,.38);pointer-events:none}
+.cam .frame::before,.cam .frame::after{content:"";position:absolute;inset:-3px;border-radius:22px;border:4px solid var(--yellow);clip-path:polygon(0 0,28% 0,28% 6%,6% 6%,6% 28%,0 28%,0 72%,6% 72%,6% 94%,28% 94%,28% 100%,72% 100%,72% 94%,94% 94%,94% 72%,100% 72%,100% 28%,94% 28%,94% 6%,72% 6%,72% 0,100% 0,100% 100%,0 100%)}
+.cam .frame::after{display:none}
+.cam .idle{position:absolute;inset:0;display:grid;place-items:center;align-content:center;gap:14px;color:#f3ece0;text-align:center;padding:24px}
+.cam .idle p{margin:0;color:#cfc6b6;max-width:30ch;font-size:.95rem}
+.cam .hint{position:absolute;left:0;right:0;bottom:12px;text-align:center;color:#fff;font-weight:700;font-size:.9rem;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.cam .stop{position:absolute;top:10px;right:10px;background:rgba(20,20,20,.7);color:#fff;border:0;border-radius:10px;padding:6px 10px;font-weight:700;font-size:.85rem}
+
+.manual{display:flex;gap:8px}
+.manual .search{flex:1;min-width:0}
+
+/* result card */
+.res{background:var(--desk);border:2px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:6px 6px 0 var(--ink)}
+.res .band{padding:12px 18px;font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:10px;color:#fff}
+.res .band i{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-style:normal;font-size:1.05rem;flex:none}
+.res.new .band{background:var(--blue)}
+.res.ok .band{background:var(--green)}
+.res.dup .band{background:var(--yellow);color:var(--ink)}
+.res.dup .band i{background:rgba(20,20,20,.12)}
+.res.nf .band{background:var(--coral)}
+.res .body{padding:16px 18px 18px;display:grid;gap:12px}
+.res .nm{font-family:var(--hand);font-size:2.3rem;line-height:.95;overflow-wrap:anywhere}
+.res .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px 2px 8px;font-weight:700;font-size:.84rem;background:color-mix(in srgb,var(--c) 16%,#fff);color:#141414;border:1.5px solid color-mix(in srgb,var(--c) 55%,#fff)}
+.pill::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--c)}
+.reg{font-weight:800;letter-spacing:.03em;font-size:1.05rem}
+.evs{display:grid;gap:4px;margin:0;padding:0;list-style:none}
+.evs li{display:flex;gap:8px;align-items:center;font-weight:600}
+.evs li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--c,#999);flex:none}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:.92rem;margin:0}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;font-weight:600}
+.facts a{color:inherit}
+.res .acts{display:grid;gap:8px}
+.res .row2{display:flex;gap:8px}
+.res .row2 .btn{flex:1}
+.res .when{font-weight:600}
+
+.recent{display:grid;gap:8px}
+.recent h3{margin:0;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.recent ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.recent li{display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;font-size:.92rem}
+.recent li b{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recent li span{color:var(--muted);font-size:.82rem}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;font-size:.82rem;color:var(--muted);border-top:2px dashed var(--line);padding-top:14px}
+.foot a{color:inherit}
+@keyframes pop{from{transform:scale(.96);opacity:.4}}
+.res{animation:pop .25s ease-out}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<section class="gate" id="gate" hidden>
+  <form class="gate-card" id="loginForm" novalidate>
+    <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="gate-body">
+      <img src="data:image/webp;base64,__LOGO__" alt="Sargotsav 2026">
+      <div style="display:grid;gap:6px"><h1>Check-in desk</h1><p>For Sargotsav organisers. Sign in with your admin email and the shared password, then scan the QR on each Artist Pass.</p></div>
+      <div class="field"><label for="em">Admin email</label><input id="em" type="email" autocomplete="username" required></div>
+      <div class="field"><label for="pw">Shared password</label><input id="pw" type="password" autocomplete="current-password" required></div>
+      <div class="alert err" id="loginErr" role="alert" hidden></div>
+      <button class="btn block" type="submit" id="loginBtn">Sign in</button>
+      <p class="fine">Signed in on the admin desk already? This page uses the same sign-in.</p>
+    </div>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="bar">
+      <div class="brand"><b>Sargotsav check-in</b><span>14 Nov · QLS Panayappilly</span></div>
+      <div class="count" aria-live="polite"><b class="num" id="nIn">0</b><em class="num"> / <i id="nAll">0</i></em><span>present</span></div>
+    </div>
+  </header>
+
+  <main class="wrapx">
+    <div class="cam" id="cam">
+      <video id="video" playsinline muted hidden></video>
+      <div class="frame" id="frame" hidden></div>
+      <button class="stop" type="button" id="stopCam" hidden>Stop camera</button>
+      <div class="hint" id="camHint" hidden>Point at the QR on the pass</div>
+      <div class="idle" id="camIdle">
+        <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#FFC23A" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="8" height="8" rx="1"/></svg>
+        <button class="btn yellow" type="button" id="startCam">Start scanning</button>
+        <p id="camMsg">Uses this phone's back camera. Nothing is recorded.</p>
+      </div>
+    </div>
+
+    <form class="manual" id="manual" autocomplete="off">
+      <input class="search" id="code" inputmode="numeric" placeholder="Or type a reg. no., e.g. 42" aria-label="Registration number">
+      <button class="btn" type="submit">Find</button>
+    </form>
+
+    <div id="result" aria-live="assertive"></div>
+
+    <section class="recent" id="recentBox" hidden>
+      <h3>Checked in on this phone</h3>
+      <ul id="recent"></ul>
+    </section>
+
+    <div class="foot">
+      <span id="meEmail"></span>
+      <span><a href="admin.html">Admin desk</a> · <button class="btn sm ghost" type="button" id="signout">Sign out</button></span>
+    </div>
+  </main>
+</div>
+
+<script>
+const SUPABASE_URL="https://frkcdmvezjrqybbifnod.supabase.co";
+const SUPABASE_KEY="sb_publishable_o8Qqrd0GmPvTxCWPb9o7Nw_UW1KVlQe";
+const ITEMS=__ITEMS__;
+const CATS=[["kids","Kids","#F57A22"],["children","Children","#308E40"],["subjunior","Sub-Junior","#4581CB"],["junior","Junior","#4F5BA3"],["teens","Teens","#E2246E"]];
+const CN=Object.fromEntries(CATS.map(c=>[c[0],c[1]])), CC=Object.fromEntries(CATS.map(c=>[c[0],c[2]]));
+const COLORS=["#FFC23A","#9DD1C0","#F57A22","#E2246E","#4581CB","#308E40","#F14F3A","#4F5BA3","#2B7D60"];
+const EV={};for(const k in ITEMS)ITEMS[k].forEach((i,n)=>EV[i.code]={...i,cat:k,color:COLORS[n%COLORS.length]});
+const $=s=>document.querySelector(s);
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const div=r=>CN[r.category]+((r.category==="junior"||r.category==="teens")?(r.gender==="boy"?" Boys":" Girls"):"");
+const fmtT=t=>new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"});
+const fmtD=d=>{const [y,m,dd]=d.split("-");return `${dd}/${m}/${y}`};
+const ageOn=dob=>{const d=new Date(dob+"T00:00:00");let a=2026-d.getFullYear();if(d.getMonth()>5||(d.getMonth()===5&&d.getDate()>1))a--;return a};
+
+let me="", busy=false, current=null, recent=[];
+try{recent=JSON.parse(sessionStorage.getItem("sg_recent")||"[]")}catch(e){}
+
+/* ---------- token from a scanned QR ---------- */
+// Pass QRs hold https://<site>/checkin.html?t=<token>, or SARGOTSAV:<token> when the site address was unknown.
+function codeFrom(text){
+  const s=String(text||"").trim();
+  const m=s.match(/[?&#]t=([A-Za-z0-9_-]{20,64})/)||s.match(/^SARGOTSAV:([A-Za-z0-9_-]{20,64})$/i)||s.match(/^([A-Za-z0-9_-]{20,64})$/);
+  if(m)return m[1];
+  if(/^(SGV-?)?\d{1,5}$/i.test(s))return s;
+  return null;
+}
+
+/* ---------- auth (same flow and session as admin.html) ---------- */
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){$("#gate").hidden=false;$("#app").hidden=true;$("#em").value=store.get("sg_admin_email")||"";($("#em").value?$("#pw"):$("#em")).focus();return}
+  me=(session.user.email||"").toLowerCase();
+  const {data,error}=await sb.from("admins").select("email").eq("email",me);
+  if(error||!data||!data.length){await sb.auth.signOut();$("#gate").hidden=false;$("#app").hidden=true;
+    const e=$("#loginErr");e.textContent="This email isn't on the admin list.";e.hidden=false;return}
+  $("#gate").hidden=true;$("#app").hidden=false;$("#meEmail").textContent=me;
+  renderRecent();counts();setInterval(counts,30000);
+  const t=new URLSearchParams(location.search).get("t");
+  if(t){history.replaceState(null,"",location.pathname);lookup(t)}
+}
+$("#loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();const err=$("#loginErr");err.hidden=true;
+  const email=$("#em").value.trim().toLowerCase(),password=$("#pw").value;
+  if(!email||!password){err.textContent="Enter your admin email and the shared password.";err.hidden=false;return}
+  const b=$("#loginBtn");b.disabled=true;b.textContent="Checking…";
+  try{
+    const r=await fetch(SUPABASE_URL+"/functions/v1/admin-login",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){err.textContent=r.status===429?"Too many wrong tries. Sign-in is locked for 15 minutes for this email.":
+      r.status===401?"That email isn't an admin, or the password is wrong.":"Sign-in failed. Try again in a minute.";err.hidden=false;return}
+    const {error}=await sb.auth.verifyOtp({token_hash:j.token_hash,type:"magiclink"});
+    if(error){err.textContent="Sign-in failed: "+error.message;err.hidden=false;return}
+    store.set("sg_admin_email",email);$("#pw").value="";await boot();
+  }catch(x){err.textContent="Couldn't reach the server. Check your internet connection.";err.hidden=false}
+  finally{b.disabled=false;b.textContent="Sign in"}
+});
+$("#signout").onclick=async()=>{stopCam();await sb.auth.signOut();location.reload()};
+
+async function counts(){
+  const [a,b]=await Promise.all([
+    sb.from("registrations").select("id",{count:"exact",head:true}),
+    sb.from("registrations").select("id",{count:"exact",head:true}).not("checked_in_at","is",null)]);
+  if(!a.error)$("#nAll").textContent=a.count??0;
+  if(!b.error)$("#nIn").textContent=b.count??0;
+}
+
+/* ---------- look up + mark ---------- */
+async function lookup(code){
+  if(busy)return;busy=true;
+  $("#result").innerHTML=`<div class="res new"><div class="band"><i>…</i>Looking up</div></div>`;
+  try{
+    const {data,error}=await sb.rpc("checkin_lookup",{p_code:code});
+    if(error)throw error;
+    current=data;
+    if(!data){showNotFound(code);buzz([80,60,80]);return}
+    showPerson(data);buzz(60);
+  }catch(e){
+    current=null;const m=String(e.message||e);
+    $("#result").innerHTML=`<div class="res nf"><div class="band"><i>!</i>${m.includes("not_admin")?"You're not on the admin list":"Couldn't reach the server"}</div><div class="body"><p class="fine">${m.includes("not_admin")?"Sign out and sign in with an admin email.":"Check the internet connection and scan again."}</p></div></div>`;
+  }finally{busy=false}
+}
+function showNotFound(code){
+  $("#result").innerHTML=`<div class="res nf"><div class="band"><i>✕</i>No pass found</div><div class="body">
+    <p style="margin:0">${/^(SGV-?)?\d{1,5}$/i.test(code)?`There's no registration ${esc(code.toUpperCase())}.`:"This QR isn't a Sargotsav pass, or the registration was deleted."}</p>
+    <p class="fine">Ask for their reg. no. and type it below, or call 92499 99743.</p>
+    <button class="btn ghost block" type="button" data-next>Scan next</button></div></div>`;
+  wireNext();
+}
+function showPerson(r){
+  const state=r.checked_in_at?(r._just?"ok":"dup"):"new";
+  const band=state==="ok"?`<i>✓</i>Present · checked in`:state==="dup"?`<i>!</i>Already checked in`:`<i>?</i>Confirm attendance`;
+  const evs=(r.items||[]).map(c=>{const e=EV[c];return `<li style="--c:${e?e.color:"#999"}">${esc(e?e.en:c)}</li>`}).join("");
+  $("#result").innerHTML=`<div class="res ${state}"><div class="band">${band}</div><div class="body">
+    <div class="nm">${esc(r.name)}</div>
+    <div class="meta"><span class="reg num">${esc(r.reg_no)}</span><span class="pill" style="--c:${CC[r.category]}">${esc(div(r))}</span></div>
+    <ul class="evs">${evs}</ul>
+    <dl class="facts"><dt>Age</dt><dd>${ageOn(r.dob)} · born ${fmtD(r.dob)}</dd><dt>Phone</dt><dd><a href="tel:+91${esc(r.phone)}">${esc(r.phone)}</a></dd>
+      ${r.checked_in_at?`<dt>Checked in</dt><dd class="when">${fmtT(r.checked_in_at)}${r.checked_in_by?` · ${esc(r.checked_in_by.split("@")[0])}`:""}</dd>`:""}
+      ${!r.by_token?`<dt>Found by</dt><dd>typed reg. no. Check the name with the pass.</dd>`:""}</dl>
+    <div class="acts">${state==="new"
+      ?`<button class="btn go block" type="button" id="markBtn">✓ Mark present</button><button class="btn ghost block" type="button" data-next>Cancel</button>`
+      :`<button class="btn block" type="button" data-next>Scan next</button><button class="btn sm ghost" type="button" id="undoBtn">Undo check-in</button>`}</div>
+  </div></div>`;
+  const mb=$("#markBtn");if(mb)mb.onclick=()=>mark(false);
+  const ub=$("#undoBtn");if(ub)ub.onclick=()=>{if(confirm(`Undo the check-in for ${r.name}?`))mark(true)};
+  wireNext();
+  if(state==="new")mb.focus();
+}
+async function mark(undo){
+  if(!current||busy)return;busy=true;
+  const btn=$("#markBtn")||$("#undoBtn");if(btn){btn.disabled=true;btn.textContent=undo?"Undoing…":"Saving…"}
+  try{
+    const {data,error}=await sb.rpc("checkin_mark",{p_id:current.id,p_undo:undo});
+    if(error)throw error;
+    current={...current,checked_in_at:data.checked_in_at,checked_in_by:data.checked_in_by,_just:!undo&&!data.already};
+    if(undo){recent=recent.filter(x=>x.id!==current.id)}
+    else if(!data.already){recent=[{id:current.id,n:current.name,r:current.reg_no,t:data.checked_in_at},...recent.filter(x=>x.id!==current.id)].slice(0,30);buzz([40,40,120])}
+    try{sessionStorage.setItem("sg_recent",JSON.stringify(recent))}catch(e){}
+    renderRecent();counts();
+    busy=false;
+    if(undo){current={...current,checked_in_at:null,checked_in_by:null};showPerson(current)}else showPerson(current);
+  }catch(e){busy=false;if(btn){btn.disabled=false;btn.textContent=undo?"Undo check-in":"✓ Mark present"}alert("Couldn't save: "+(e.message||e))}
+}
+function wireNext(){document.querySelectorAll("[data-next]").forEach(b=>b.onclick=()=>{$("#result").innerHTML="";current=null;$("#code").value="";if(stream)resumeScan();else window.scrollTo({top:0,behavior:"smooth"})})}
+function renderRecent(){
+  $("#recentBox").hidden=!recent.length;
+  $("#recent").innerHTML=recent.map(x=>`<li><b>${esc(x.n)}</b><span class="num">${esc(x.r)}</span><span>${new Date(x.t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"})}</span></li>`).join("");
+}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+
+$("#manual").addEventListener("submit",e=>{e.preventDefault();const v=$("#code").value.trim();if(!v)return;
+  const c=codeFrom(v);if(!c){showNotFound(v);return}$("#code").blur();lookup(c)});
+
+/* ---------- camera ---------- */
+let stream=null, detector=null, scanning=false, lastText="", lastAt=0;
+const video=$("#video"), cv=document.createElement("canvas"), cx=cv.getContext("2d",{willReadFrequently:true});
+async function startCam(){
+  const msg=$("#camMsg");
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg.textContent="This browser can't open the camera. Use Chrome or Safari, or type the reg. no. below.";return}
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
+  }catch(e){msg.textContent=e.name==="NotAllowedError"?"Camera permission was refused. Allow the camera for this site in the browser settings, then try again.":"Couldn't open the camera: "+e.message;return}
+  video.srcObject=stream;await video.play().catch(()=>{});
+  if("BarcodeDetector" in window){try{const f=await BarcodeDetector.getSupportedFormats();if(f.includes("qr_code"))detector=new BarcodeDetector({formats:["qr_code"]})}catch(e){}}
+  video.hidden=false;$("#frame").hidden=false;$("#camHint").hidden=false;$("#stopCam").hidden=false;$("#camIdle").hidden=true;
+  resumeScan();
+}
+function stopCam(){
+  scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+  video.hidden=true;$("#frame").hidden=true;$("#camHint").hidden=true;$("#stopCam").hidden=true;$("#camIdle").hidden=false;
+}
+function resumeScan(){if(!stream)return;scanning=true;$("#camHint").textContent="Point at the QR on the pass";window.scrollTo({top:0,behavior:"smooth"});requestAnimationFrame(tick)}
+async function tick(){
+  if(!scanning||!stream)return;
+  if(video.readyState>=2&&!busy){
+    let text=null;
+    try{
+      if(detector){const r=await detector.detect(video);if(r.length)text=r[0].rawValue}
+      else if(window.jsQR){const w=video.videoWidth,h=video.videoHeight,s=Math.min(w,h),sz=Math.min(640,s);
+        cv.width=sz;cv.height=sz;cx.drawImage(video,(w-s)/2,(h-s)/2,s,s,0,0,sz,sz);
+        const img=cx.getImageData(0,0,sz,sz);const r=jsQR(img.data,sz,sz,{inversionAttempts:"attemptBoth"});if(r)text=r.data}
+    }catch(e){}
+    if(text&&!(text===lastText&&Date.now()-lastAt<4000)){
+      lastText=text;lastAt=Date.now();const c=codeFrom(text);
+      scanning=false;$("#camHint").textContent="Got it";
+      if(c)await lookup(c);else{showNotFound(text);buzz([80,60,80])}
+      $("#result").scrollIntoView({behavior:"smooth",block:"start"});
+      return;
+    }
+  }
+  setTimeout(()=>requestAnimationFrame(tick),detector?120:180);
+}
+$("#startCam").onclick=startCam;
+$("#stopCam").onclick=stopCam;
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&stream)stopCam()});
+
+boot();
+</script>
+</body>
+</html>
