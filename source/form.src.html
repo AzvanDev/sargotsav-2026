@@ -102,6 +102,10 @@ html[lang=ml] h2{letter-spacing:0;font-size:1.5rem}
 .f{display:grid;gap:5px}
 .f label,.f .lab{font-weight:700;font-size:.92rem}
 .f input{width:100%;border:2px solid #cfc2ad;border-radius:14px;padding:11px 13px;background:var(--paper);font-size:1rem;min-height:48px}
+.f{min-width:0}
+.f input[type=date]{-webkit-appearance:none;appearance:none;display:block;min-width:0;max-width:100%;box-sizing:border-box;text-align:left;color:var(--ink);line-height:1.3}
+.f input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0;min-height:1.3em}
+.f input[type=date]::-webkit-calendar-picker-indicator{opacity:.6}
 .f input:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px var(--yellow)}
 .f.bad input{border-color:var(--coral)}
 .err{color:var(--coral);font-size:.84rem;font-weight:600;min-height:0}
