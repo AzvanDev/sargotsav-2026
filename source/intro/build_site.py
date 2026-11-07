@@ -27,7 +27,7 @@ fav.resize((192,192),Image.LANCZOS).save(os.path.join(A,'icon-192.png'));fav.res
 s=s.replace('__FAVICON__','assets/intro/favicon.png').replace('<link rel="icon" href="assets/intro/favicon.png">','<link rel="icon" href="assets/intro/favicon.png">\n<link rel="apple-touch-icon" href="assets/intro/icon-192.png">')
 og=os.path.join(SRC,'og.jpg')
 if os.path.exists(og):shutil.copy(og,os.path.join(A,'og.jpg'))
-s=s.replace('__OGIMG__','assets/intro/og.jpg')
+s=s.replace('__OGIMG__','https://sargotsav-2026-kochi.vercel.app/assets/intro/og.jpg')  # crawlers (WhatsApp) need an absolute URL
 assert '__' not in re.sub(r'window\.__\w+|__dbg|__frame|__ready|__TL','',s),'placeholder left'
 open(os.path.join(OUT,'index.html'),'w',encoding='utf-8').write(s)
 print('site written to',OUT)
