@@ -186,6 +186,11 @@ precision highp float;precision highp sampler2D;
 in vec2 vUv;layout(location=0) out vec4 o;layout(location=1) out vec4 o2;
 uniform sampler2D uMeta;
 `+PU_;
+// calm zone behind the logo, words, chips, button and doodles (soft edge that wanders a little)
+const PROT_=`float prot(vec2 p){vec2 j=(vec2(noise(p*.03),noise(p*.03+7.))-.5)*12.;vec2 q=p+j;float v=texture(uProt,q/uRes).r*.4;
+ for(int k=0;k<6;k++){float a=float(k)*1.047;v+=.1*texture(uProt,(q+vec2(cos(a),sin(a))*20.)/uRes).r;}
+ return smoothstep(.15,.85,v);}
+`;
 const FS={
 copy:HS_+`uniform sampler2D uSrc;void main(){o=texture(uSrc,vUv);o2=texture(uMeta,vUv);}`,
 wall:H_+N_+`void main(){vec2 p=P(vUv);o=vec4(noise(p*.06)*.55+noise(p*.21+3.)*.3+noise(p*.9+7.)*.15,0.,0.,1.);}`,
@@ -337,11 +342,11 @@ void main(){
  if(f<=0.||l2<.1){o=o0;return;}
  o=mix(o0,texture(uSrc,UV(p-ab*.9)),f*.8);
 }`,
-display:H_+`uniform sampler2D uDye,uClr,uWall;
+display:H_+`uniform sampler2D uDye,uClr,uWall,uProt;
 uniform vec2 uDyeTexel;
 uniform vec3 uLight;
-uniform float uTime,uSweep,uUseClr,uHS;
-`+N_+`
+uniform float uTime,uSweep,uUseClr,uHS,uProtOn;
+`+N_+PROT_+`
 float TT(vec2 uv){float t=texture(uDye,uv).a;return uUseClr>.5?t*(1.-texture(uClr,uv).r):t;}
 float sbox(vec2 r,vec2 c,vec2 s,float soft){vec2 q=abs(r-c)-s;float d=length(max(q,0.))+min(max(q.x,q.y),0.);return 1.-smoothstep(-soft,soft,d);}
 void main(){
@@ -383,6 +388,10 @@ void main(){
  float s1=TT(uv+lt*3./uRes),s2=TT(uv+lt*7./uRes);
  wall*=1.-(.13*smoothstep(.08,.8,s1)+.08*smoothstep(.35,1.3,s2))*(1.-cov);
  col*=1.-.16*smoothstep(.12,.7,s1-T)*cov;
+ // behind the details, paint thrown later thins to a soft flat wash of its colour so they stay easy to read
+ // (only where the brush cleaned the wall, so paint left from the intro never changes)
+ float pz=uProtOn>0.&&cov>0.?uProtOn*prot(p)*smoothstep(.5,.95,texture(uClr,uv).r):0.;
+ col=mix(col,mix(wall,pc,.3),pz);shine*=1.-.9*pz;
  vec3 outc=mix(wall,col,cov)+shine*cov;
  o=vec4(clamp(outc,0.,1.),1.);
 }`
@@ -404,7 +413,11 @@ function glInit(){
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));
-  FL={progs,maskTex};
+  const protTex=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,protTex);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,new Uint8Array([0,0,0,255]));
+  FL={progs,maskTex,protTex};protDirty=true;
   return true;
 }
 function fbo(w,h,ifmt,fmt,type,filter){
@@ -562,6 +575,7 @@ function glRender(t,src){
   gl.uniform1i(u.uDye,tex(0,src.a.tex));gl.uniform1i(u.uClr,tex(1,FL.clr.tex));gl.uniform1i(u.uWall,tex(2,FL.wall.tex));
   gl.uniform2f(u.uDyeTexel,1/src.w,1/src.h);gl.uniform3f(u.uLight,light.x,light.y,light.z);
   gl.uniform1f(u.uTime,t);gl.uniform1f(u.uSweep,clamp(t/1.2,0,1));gl.uniform1f(u.uUseClr,baked?0:1);gl.uniform1f(u.uHS,4.6);
+  gl.uniform1f(u.uProtOn,baked?1:0);gl.uniform1i(u.uProt,tex(4,protTexture()));
   drawTo(null);
 }
 // jump the paint to its finished state (skip, return visit, big resize)
@@ -592,6 +606,7 @@ function relayout(keepState){
   zone={x0:PHONE?-14:Math.max(mX,Math.min(hr.left,db.x0)-padX),x1:PHONE?W+14:Math.min(W-mX,Math.max(hr.right,db.x1)+padX),
         y0:Math.max(PHONE?66:70,Math.min(hr.top,db.y0)-padY),y1:Math.min(H-(PHONE?12:18),Math.max(hr.bottom,db.y1)+padY)};
   window.__fitInfo=fitDoodles();
+  buildProt();
   buildBrushPath();
   sizeLogoCanvas();pillIndicator();
   if(keepState){sizeMask();if(clock>TL.brushStart)paintMaskTo(clock,true)}
@@ -1141,6 +1156,35 @@ function fitDoodles(){
   let k=0;for(const id in dEls)if(dEls[id].on)dEls[id].order=k++;
   return{S,shown:on.filter(e=>e.on).length,hidden:on.filter(e=>!e.on).map(e=>e.d.id)};
 }
+// calm zone for paint thrown after the intro: the logo, the words, chips, button and every shown doodle
+const pk=document.createElement('canvas'),pkx=pk.getContext('2d'),PS=.25;
+let protDirty=true;
+function buildProt(){
+  pk.width=Math.max(2,Math.round(W*PS));pk.height=Math.max(2,Math.round(H*PS));
+  const c=pkx,pad=PHONE?18:24;c.setTransform(PS,0,0,PS,0,0);c.clearRect(0,0,W,H);c.fillStyle='#fff';
+  const box=(x0,y0,x1,y1,r)=>{c.beginPath();if(c.roundRect)c.roundRect(x0,y0,x1-x0,y1-y0,Math.min(r,(x1-x0)/2,(y1-y0)/2));else c.rect(x0,y0,x1-x0,y1-y0);c.fill()};
+  for(const r of heroRects())box(r.x0-pad,r.y0-pad,r.x1+pad,r.y1+pad,pad+12);
+  const cr=document.getElementById('credit');if(cr){const r=cr.getBoundingClientRect();if(r.width)box(r.left-8,r.top-8,r.right+8,r.bottom+8,24)}
+  for(const id in dEls){const e=dEls[id];if(!e.on)continue;c.beginPath();c.arc(e.x+e.size/2,e.y+e.size/2,e.size*.6+pad*.4,0,7);c.fill()}
+  protDirty=true;
+}
+function protTexture(){
+  if(protDirty){gl.activeTexture(gl.TEXTURE4);gl.bindTexture(gl.TEXTURE_2D,FL.protTex);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,pk);protDirty=false}
+  return FL.protTex;
+}
+// tap colours come from a shuffled bag so a wall full of throws stays balanced,
+// and never match the paint under the tap, its close neighbours or the last two throws
+const TAPCOL=['orange','coral','magenta','blue','green','teal','yellow','indigo','mint'];
+let tapBag=[],tapLast=[];
+function tapColour(x,y,R,now){
+  const avoid=new Set(tapLast);
+  for(const s of items){if(s.type!==0||s.t0>now+.5)continue;const d=Math.hypot(x-s.x,y-s.y);
+    if(d<(s.R+R)*1.05)for(const n of TAPCOL){const c=hex(PAL[n]);if(c[0]===s.col[0]&&c[1]===s.col[1]&&c[2]===s.col[2])avoid.add(n)}}
+  if(!tapBag.length){tapBag=TAPCOL.slice();for(let i=tapBag.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[tapBag[i],tapBag[j]]=[tapBag[j],tapBag[i]]}}
+  let k=tapBag.findIndex(n=>!avoid.has(n));
+  if(k<0){const n=TAPCOL.find(n=>!avoid.has(n))||tapBag[0];k=tapBag.indexOf(n);if(k<0){tapBag.push(n);k=tapBag.length-1}}
+  const n=tapBag.splice(k,1)[0];tapLast=[n,...tapLast].slice(0,2);return hex(PAL[n]);
+}
 function doodleBounds(){
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   for(const id in dEls){const e=dEls[id];if(!e.on)continue;x0=Math.min(x0,e.x);y0=Math.min(y0,e.y);x1=Math.max(x1,e.x+e.size);y1=Math.max(y1,e.y+e.size)}
@@ -1396,11 +1440,12 @@ $('#skip').onclick=()=>{skipTo(Math.max(clock,TL.logoDone+.2))};
 cv.addEventListener('pointerdown',e=>{
   hideTip();askTilt();
   if(!FL||!baked)return;
-  const r=rng((Math.random()*1e9)|0),cols=Object.values(PAL);
-  const now=(performance.now()-start)/1000, fly=.24;
-  const s=makeSplat(r,e.clientX,e.clientY,Math.min(W,H)*(.07+r()*.05),hex(cols[(r()*cols.length)|0]),now+fly,false);
+  const r=rng((Math.random()*1e9)|0);
+  const now=(performance.now()-start)/1000, fly=.24, R=Math.min(W,H)*(.07+r()*.05);
+  const x=e.clientX,y=e.clientY;
+  const s=makeSplat(r,x,y,R,tapColour(x,y,R,now),now+fly,false);
   s.useClr=false;s.tap=true;items.push(s);
-  addBalloon(s,fly,[e.clientX+(e.clientX-W*.5)*.5+(r()-.5)*60,H+s.R*.8]);wakeUntil=Math.max(wakeUntil,now+fly+1.2);
+  addBalloon(s,fly,[x+(x-W*.5)*.5+(r()-.5)*60,H+s.R*.8]);wakeUntil=Math.max(wakeUntil,now+fly+1.2);
   for(let k=0;k<7;k++){const d=makeDrop(r,s,false);d.useClr=false;items.push(d)}
   for(let k=0;k<10;k++){const d=makeDrop(r,s,true);d.useClr=false;items.push(d)}
   items.sort((a,b)=>a.t0-b.t0);
