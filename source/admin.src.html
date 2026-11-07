@@ -87,14 +87,21 @@ a{color:inherit}
 }
 
 /* ---------- overview ---------- */
-.totals{display:grid;grid-template-columns:1.3fr repeat(3,1fr);gap:12px}
+.totals{display:grid;grid-template-columns:1.3fr repeat(4,1fr);gap:12px}
+.status{display:grid;gap:4px;justify-items:start}
+.st{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:1px 9px;font-size:.76rem;font-weight:700;white-space:nowrap;border:1.5px solid}
+.st.in{background:#e6f2e8;color:#1f5f2b;border-color:#308E40}
+.st.wait{background:transparent;color:var(--muted);border-color:var(--line2)}
+.st.mailfail{background:#fde8e5;color:#9d2a1c;border-color:#F14F3A}
+.roster li .ok{color:#1f5f2b;font-weight:800;font-size:.8rem;white-space:nowrap}
 .total{background:var(--desk);border:2px solid var(--line);border-radius:18px;padding:16px 18px;display:grid;gap:2px}
 .total.big{background:var(--ink);color:#fff;border-color:var(--ink)}
 .total b{font-size:2.4rem;font-weight:800;line-height:1;letter-spacing:-.02em}
 .total.big b{font-size:3.2rem}
 .total span{font-size:.85rem;font-weight:600;color:var(--muted)}
 .total.big span{color:#cfc6b6}
-@media (max-width:760px){.totals{grid-template-columns:1fr 1fr}.total.big{grid-column:1/-1}}
+@media (max-width:1100px){.totals{grid-template-columns:repeat(3,1fr)}.total.big{grid-column:1/-1}}
+@media (max-width:560px){.totals{grid-template-columns:1fr 1fr}}
 .two{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:1000px){.two{grid-template-columns:1fr}}
 .panel{background:var(--desk);border:2px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:14px;min-width:0}
@@ -145,7 +152,7 @@ a{color:inherit}
 .chip small{font-weight:700;opacity:.7}
 .resultbar{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.86rem;color:var(--muted)}
 .tablewrap{overflow-x:auto;background:var(--desk);border:2px solid var(--line);border-radius:18px}
-table{border-collapse:collapse;width:100%;min-width:860px;font-size:.9rem}
+table{border-collapse:collapse;width:100%;min-width:980px;font-size:.9rem}
 th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 thead th{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700;background:#fbf4e7;position:sticky;top:0}
 thead th button{border:0;background:none;padding:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;display:inline-flex;gap:4px}
@@ -260,6 +267,7 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
         <div class="total"><span>Event entries</span><b class="num" id="tEntries">0</b></div>
         <div class="total"><span>Last 24 hours</span><b class="num" id="tDay">0</b></div>
         <div class="total"><span>Boys · Girls</span><b class="num" id="tBG">0 · 0</b></div>
+        <div class="total"><span>Checked in on the day</span><b class="num" id="tIn">0</b></div>
       </div>
       <div class="two">
         <div class="panel">
@@ -290,6 +298,7 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
         <input class="search" id="q" type="search" placeholder="Search name, reg. no., phone or email" aria-label="Search">
         <select class="select" id="fGender" aria-label="Gender"><option value="">Boys and girls</option><option value="boy">Boys</option><option value="girl">Girls</option></select>
         <select class="select" id="fEvent" aria-label="Event"></select>
+        <select class="select" id="fCheck" aria-label="Check-in"><option value="">Any status</option><option value="in">Checked in</option><option value="out">Not checked in</option><option value="mailfail">Pass email failed</option></select>
         <button class="btn soft sm" type="button" id="clearF">Clear</button>
       </div>
       <div class="resultbar"><span id="fNote"></span><span id="fCount" class="num"></span></div>
@@ -303,6 +312,7 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
             <th><button type="button" data-sort="dob">Date of birth</button></th>
             <th>Phone</th>
             <th><button type="button" data-sort="created_at">Registered</button></th>
+            <th><button type="button" data-sort="checked_in_at">Status</button></th>
           </tr></thead>
           <tbody id="peopleRows"></tbody>
         </table>
@@ -366,7 +376,7 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
-let rows=[],admins=[],me="",view="overview",f={cat:"",g:"",ev:"",q:""},sort={k:"created_at",d:-1},rosterEv="";
+let rows=[],admins=[],me="",view="overview",f={cat:"",g:"",ev:"",q:"",ck:""},sort={k:"created_at",d:-1},rosterEv="";
 
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const div=r=>CN[r.category]+((r.category==="junior"||r.category==="teens")?(r.gender==="boy"?" Boys":" Girls"):"");
@@ -375,6 +385,8 @@ const fmtD=d=>{const [y,m,dd]=d.split("-");return `${dd}/${m}/${y}`};
 const fmtT=t=>new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"});
 const ageOn=dob=>{const d=new Date(dob+"T00:00:00");let a=2026-d.getFullYear();if(d.getMonth()>5||(d.getMonth()===5&&d.getDate()>1))a--;return a};
 const evName=c=>EV[c]?EV[c].en:c;
+const statusCell=r=>`<div class="status">${r.checked_in_at?`<span class="st in" title="Checked in ${fmtT(r.checked_in_at)}${r.checked_in_by?" by "+esc(r.checked_in_by):""}">✓ In</span>`:`<span class="st wait">Not yet</span>`}${r.email_error?`<span class="st mailfail" title="${esc(r.email_error)}">Email failed</span>`:""}</div>`;
+const mailText=r=>r.email_error?`<span style="color:#9d2a1c">Failed: ${esc(r.email_error)}</span>`:r.email_sent_at?`Sent ${fmtT(r.email_sent_at)}${r.email_sends>1?` (${r.email_sends} times)`:""}`:"Not sent yet";
 function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>t.hidden=true,2600)}
 function showErr(m){const e=$("#appErr");e.textContent=m;e.hidden=!m}
 
@@ -432,14 +444,14 @@ function counts(list){const c={};list.forEach(r=>r.items.forEach(i=>c[i]=(c[i]||
 function renderOverview(){
   const boys=rows.filter(r=>r.gender==="boy").length;
   $("#tAll").textContent=rows.length;$("#tEntries").textContent=rows.reduce((a,r)=>a+r.items.length,0);
-  $("#tDay").textContent=rows.filter(r=>Date.now()-new Date(r.created_at)<864e5).length;$("#tBG").textContent=`${boys} · ${rows.length-boys}`;
+  $("#tDay").textContent=rows.filter(r=>Date.now()-new Date(r.created_at)<864e5).length;$("#tBG").textContent=`${boys} · ${rows.length-boys}`;$("#tIn").textContent=`${rows.filter(r=>r.checked_in_at).length} of ${rows.length}`;
   const close=new Date("2026-11-10T23:59:59+05:30");const left=Math.ceil((close-Date.now())/864e5);
   $("#ovSub").textContent=left>0?`Entries close 10 Nov, 11:59 pm · ${left} day${left>1?"s":""} left`:"Entries are closed";
   const max=Math.max(1,...CATS.map(c=>rows.filter(r=>r.category===c[0]).length));
   $("#catBars").innerHTML=CATS.map(([k,n,c])=>{const l=rows.filter(r=>r.category===k),b=l.filter(r=>r.gender==="boy").length,g=l.length-b;
     return `<button type="button" class="catrow" data-cat="${k}" style="--c:${c}"><span class="nm"><i></i>${n}</span>
       <span class="bar" title="${b} boys, ${g} girls"><b style="width:${b/max*100}%"></b><b class="g" style="width:${g/max*100}%"></b></span><span class="n num">${l.length}</span></button>`}).join("");
-  $$("#catBars [data-cat]").forEach(b=>b.onclick=()=>{f={cat:b.dataset.cat,g:"",ev:"",q:""};$("#q").value="";go("people");renderAll()});
+  $$("#catBars [data-cat]").forEach(b=>b.onclick=()=>{f={cat:b.dataset.cat,g:"",ev:"",q:"",ck:""};$("#q").value="";go("people");renderAll()});
   const c=counts(rows);const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,8);
   $("#topEvents").innerHTML=top.length?top.map(([code,n],i)=>`<li><span class="rank">${i+1}</span><span class="ev">${esc(evName(code))}<small>${CN[EV[code]?.cat]||""}</small></span><span class="ct num">${n}</span></li>`).join("")
     :`<li style="display:block" class="empty"><b>No entries yet</b>Events appear here as people register.</li>`;
@@ -448,7 +460,7 @@ function renderOverview(){
   $$("#recent [data-id]").forEach(b=>b.onclick=()=>openSheet(b.dataset.id));
 }
 
-function filtered(){const q=f.q.trim().toLowerCase();return rows.filter(r=>(!f.cat||r.category===f.cat)&&(!f.g||r.gender===f.g)&&(!f.ev||r.items.includes(f.ev))&&
+function filtered(){const q=f.q.trim().toLowerCase();return rows.filter(r=>(!f.cat||r.category===f.cat)&&(!f.g||r.gender===f.g)&&(!f.ev||r.items.includes(f.ev))&&(!f.ck||(f.ck==='in'?!!r.checked_in_at:f.ck==='out'?!r.checked_in_at:!!r.email_error))&&
   (!q||[r.name,r.reg_no,r.phone,r.email].some(v=>String(v).toLowerCase().includes(q))))}
 function renderPeople(){
   $("#catChips").innerHTML=`<button type="button" class="chip" data-c="" aria-pressed="${!f.cat}">All <small class="num">${rows.length}</small></button>`+
@@ -456,9 +468,9 @@ function renderPeople(){
   $$("#catChips [data-c]").forEach(b=>b.onclick=()=>{f.cat=b.dataset.c;if(f.ev&&f.cat&&EV[f.ev].cat!==f.cat)f.ev="";renderPeople()});
   const evOpts=(f.cat?[f.cat]:CATS.map(c=>c[0])).map(k=>`<optgroup label="${CN[k]}">`+ITEMS[k].map(i=>`<option value="${i.code}" ${f.ev===i.code?"selected":""}>${esc(i.en)}</option>`).join("")+"</optgroup>").join("");
   $("#fEvent").innerHTML=`<option value="">All events</option>`+evOpts;$("#fGender").value=f.g;
-  let list=filtered();const k=sort.k;list.sort((a,b)=>(a[k]>b[k]?1:a[k]<b[k]?-1:0)*sort.d);
+  let list=filtered();const k=sort.k;list.sort((a,b)=>{const x=a[k]??"",y=b[k]??"";return (x>y?1:x<y?-1:0)*sort.d});
   $$("[data-sort]").forEach(b=>{if(b.dataset.sort===k)b.setAttribute("aria-sort",sort.d>0?"ascending":"descending");else b.removeAttribute("aria-sort");b.textContent=b.textContent.replace(/ [↑↓]$/,"")+(b.dataset.sort===k?(sort.d>0?" ↑":" ↓"):"")});
-  const note=[f.cat&&CN[f.cat],f.g&&(f.g==="boy"?"Boys":"Girls"),f.ev&&evName(f.ev),f.q&&`"${f.q}"`].filter(Boolean);
+  const note=[f.cat&&CN[f.cat],f.g&&(f.g==="boy"?"Boys":"Girls"),f.ev&&evName(f.ev),f.ck&&({in:"Checked in",out:"Not checked in",mailfail:"Pass email failed"}[f.ck]),f.q&&`"${f.q}"`].filter(Boolean);
   $("#fNote").textContent=note.length?"Showing "+note.join(" · "):"Showing everyone";$("#fCount").textContent=`${list.length} of ${rows.length}`;
   $("#peopleRows").innerHTML=list.length?list.map(r=>`<tr data-id="${r.id}" tabindex="0">
     <td class="reg num">${esc(r.reg_no)}</td>
@@ -467,14 +479,15 @@ function renderPeople(){
     <td><div class="evs">${r.items.map(i=>`<span>${esc(evName(i))}</span>`).join("")}</div></td>
     <td class="num">${fmtD(r.dob)}<span class="sm">Age ${ageOn(r.dob)} on 1 June</span></td>
     <td class="num">${esc(r.phone)}</td>
-    <td class="num">${fmtT(r.created_at)}</td></tr>`).join("")
-    :`<tr><td colspan="7" class="empty">${rows.length?"<b>No one matches</b>Try clearing the filters.":"<b>No contestants yet</b>They'll appear here as soon as someone registers."}</td></tr>`;
+    <td class="num">${fmtT(r.created_at)}</td><td>${statusCell(r)}</td></tr>`).join("")
+    :`<tr><td colspan="8" class="empty">${rows.length?"<b>No one matches</b>Try clearing the filters.":"<b>No contestants yet</b>They'll appear here as soon as someone registers."}</td></tr>`;
   $$("#peopleRows tr[data-id]").forEach(tr=>{tr.onclick=()=>openSheet(tr.dataset.id);tr.onkeydown=e=>{if(e.key==="Enter")openSheet(tr.dataset.id)}});
 }
 $("#q").addEventListener("input",e=>{f.q=e.target.value;renderPeople()});
 $("#fGender").addEventListener("change",e=>{f.g=e.target.value;renderPeople()});
 $("#fEvent").addEventListener("change",e=>{f.ev=e.target.value;renderPeople()});
-$("#clearF").onclick=()=>{f={cat:"",g:"",ev:"",q:""};$("#q").value="";renderPeople()};
+$("#clearF").onclick=()=>{f={cat:"",g:"",ev:"",q:"",ck:""};$("#q").value="";$("#fCheck").value="";renderPeople()};
+$("#fCheck").addEventListener("change",e=>{f.ck=e.target.value;renderPeople()});
 $$("[data-sort]").forEach(b=>b.onclick=()=>{const k=b.dataset.sort;sort=sort.k===k?{k,d:-sort.d}:{k,d:k==="created_at"?-1:1};renderPeople()});
 
 function renderEvents(){
@@ -491,9 +504,9 @@ function renderRoster(){
   const el=$("#roster");if(!rosterEv){el.hidden=true;return}
   const ev=EV[rosterEv];const list=rows.filter(r=>r.items.includes(rosterEv)).sort((a,b)=>a.gender.localeCompare(b.gender)||a.name.localeCompare(b.name));
   el.hidden=false;el.style.setProperty("--c",CC[ev.cat]);
-  el.innerHTML=`<header><div><span class="pill" style="--c:${CC[ev.cat]}">${CN[ev.cat]}</span><h3 style="margin-top:6px">${esc(ev.en)}</h3><span class="fine">${esc(ev.ml)} · ${list.length} contestant${list.length===1?"":"s"}</span></div>
+  el.innerHTML=`<header><div><span class="pill" style="--c:${CC[ev.cat]}">${CN[ev.cat]}</span><h3 style="margin-top:6px">${esc(ev.en)}</h3><span class="fine">${esc(ev.ml)} · ${list.length} contestant${list.length===1?"":"s"} · ${list.filter(r=>r.checked_in_at).length} checked in</span></div>
     <div style="display:flex;gap:8px"><button class="btn sm" type="button" id="csvEv">Download list</button><button class="btn soft sm" type="button" id="closeRoster">Close</button></div></header>`+
-    (list.length?`<ol>${list.map((r,i)=>`<li><span class="i">${i+1}</span><span class="reg num hide-s">${esc(r.reg_no)}</span><span><b>${esc(r.name)}</b></span><span class="hide-s">${pill(r)}</span><button class="btn soft sm" type="button" data-id="${r.id}">Details</button></li>`).join("")}</ol>`
+    (list.length?`<ol>${list.map((r,i)=>`<li><span class="i">${i+1}</span><span class="reg num hide-s">${esc(r.reg_no)}</span><span><b>${esc(r.name)}</b></span><span class="hide-s">${r.checked_in_at?`<span class="ok">✓ In</span> `:""}${pill(r)}</span><button class="btn soft sm" type="button" data-id="${r.id}">Details</button></li>`).join("")}</ol>`
       :`<div class="empty"><b>No one yet</b>Nobody has picked this event so far.</div>`);
   $("#closeRoster").onclick=()=>{rosterEv="";renderRoster()};
   $("#csvEv").onclick=()=>csv(list,`sargotsav-${ev.en.replace(/[^a-z0-9]+/gi,"-").toLowerCase()}-${ev.cat}`);
@@ -535,6 +548,8 @@ function openSheet(id){
         <dt>Email</dt><dd><a href="mailto:${esc(r.email)}">${esc(r.email)}</a></dd>
         <dt>Form language</dt><dd>${r.lang==="ml"?"Malayalam":"English"}</dd>
         <dt>Registered</dt><dd class="num">${fmtT(r.created_at)}</dd>
+        <dt>Check-in</dt><dd>${r.checked_in_at?`Checked in ${fmtT(r.checked_in_at)}${r.checked_in_by?" by "+esc(r.checked_in_by):""}`:"Not checked in yet"}</dd>
+        <dt>Pass email</dt><dd>${mailText(r)}</dd>
       </dl>
       <div id="delZone"></div>
     </div>
@@ -552,9 +567,9 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sheet").hidden
 
 /* ---------- CSV ---------- */
 function csv(list,name){
-  const head=["Reg no","Name","Category","Gender","Division","Event 1","Event 2","Event 3","Date of birth","Age on 1 June","Phone","Email","Form language","Registered (IST)"];
+  const head=["Reg no","Name","Category","Gender","Division","Event 1","Event 2","Event 3","Date of birth","Age on 1 June","Phone","Email","Form language","Registered (IST)","Checked in (IST)","Checked in by","Pass email"];
   const q=v=>{let s=String(v??"");if(/^[=+\-@]/.test(s))s="'"+s;return `"${s.replace(/"/g,'""')}"`};
-  const lines=[head.map(q).join(",")].concat(list.map(r=>[r.reg_no,r.name,CN[r.category],r.gender==="boy"?"Boy":"Girl",div(r),evName(r.items[0]||""),r.items[1]?evName(r.items[1]):"",r.items[2]?evName(r.items[2]):"",fmtD(r.dob),ageOn(r.dob),r.phone,r.email,r.lang==="ml"?"Malayalam":"English",fmtT(r.created_at)].map(q).join(",")));
+  const lines=[head.map(q).join(",")].concat(list.map(r=>[r.reg_no,r.name,CN[r.category],r.gender==="boy"?"Boy":"Girl",div(r),evName(r.items[0]||""),r.items[1]?evName(r.items[1]):"",r.items[2]?evName(r.items[2]):"",fmtD(r.dob),ageOn(r.dob),r.phone,r.email,r.lang==="ml"?"Malayalam":"English",fmtT(r.created_at),r.checked_in_at?fmtT(r.checked_in_at):"",r.checked_in_by||"",r.email_error?"Failed: "+r.email_error:r.email_sent_at?"Sent "+fmtT(r.email_sent_at):"Not sent"].map(q).join(",")));
   const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"}));
   a.download=`${name}-${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();
 }
