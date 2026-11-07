@@ -35,6 +35,7 @@ source/intro/         landing page source and build script
 
 - The landing page needs WebGL2 for the paint; without it, it shows a flat painted background.
 - `?first` replays the full intro for returning visitors; `?lang=ml` opens in Malayalam.
+- Live site: https://sargotsav-2026-kochi.vercel.app. `vercel.json` turns on clean URLs, so `/register`, `/admin` and `/checkin` work and the `.html` links forward to them. `.vercelignore` keeps `source/` and this README off the site.
 - The Supabase URL and publishable key in `register.html` and `admin.html` are meant to be public. Row-level security blocks public reads; the public can only add an entry through the `register_entry` function, which re-checks age, items and duplicates.
 
 ## Admin sign-in
