@@ -27,7 +27,7 @@ source/intro/         landing page source and build script
 ## Editing
 
 - **Landing page:** edit `source/intro/src.html`, then run `python source/intro/build_site.py source/intro .` from the repo root (needs Python 3 and Pillow). It rewrites `index.html` and `assets/intro/`.
-- **Form and admin:** edit `source/form.src.html` / `source/admin.src.html`, then run `python build.py` from inside `source/` and put the generated `register.html` / `admin.html` at the repo root. Don't hand-edit `register.html` or `admin.html`.
+- **Form and admin:** edit `source/form.src.html` / `source/admin.src.html`, then run `python source/build.py` from the repo root (or from anywhere; it needs only Python 3). It rewrites `register.html` and `admin.html` at the repo root. Don't hand-edit `register.html` or `admin.html`.
 
 ## Notes
 
