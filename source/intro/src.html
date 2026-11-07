@@ -52,7 +52,7 @@ canvas{display:block}
   background:rgba(250,246,238,.92);border:2px solid var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer;color:var(--ink);
   box-shadow:3px 3px 0 var(--ink);transition:opacity .3s}
 /* hero */
-.hero{position:absolute;left:50%;top:50%;width:min(74vw,520px,calc((100vh - 330px)*1.39));min-width:min(64vw,230px);display:flex;flex-direction:column;align-items:center;text-align:center;transform:translate(-50%,-46%)}
+.hero{position:absolute;left:50%;top:50%;width:min(74vw,520px,calc((100vh - 350px)*1.39));width:min(74vw,520px,calc((100dvh - 350px)*1.39));min-width:min(64vw,230px);display:flex;flex-direction:column;align-items:center;text-align:center;transform:translate(-50%,-46%)}
 @media (max-width:759px){.hero{transform:translate(-50%,-43%)}}
 .logoWrap{position:relative;width:100%;aspect-ratio:1367/983}
 #logoCv{position:absolute;inset:0;width:100%;height:100%}
@@ -94,7 +94,7 @@ html[lang=ml] .reg{font-family:"Baloo Chettan 2",sans-serif}
 @media (min-width:760px){
   .top{padding:20px 28px 0}
   .badge{font-size:14px;gap:10px}.badge img.msm{height:25px}.badge img.cier{height:38px}.badge small{font-size:12px}
-  .hero{width:min(40vw,600px,calc((100vh - 300px)*1.39));min-width:0}
+  .hero{width:min(40vw,600px,calc((100vh - 320px)*1.39));width:min(40vw,600px,calc((100dvh - 320px)*1.39));min-width:0}
   .chip{font-size:14px}
   .sheet{left:50%;right:auto;width:440px;margin-left:-220px}
 }
@@ -106,18 +106,16 @@ html[lang=ml] .reg{font-family:"Baloo Chettan 2",sans-serif}
   .reg{min-width:0;padding:14px 22px;font-size:17px}
   .top{padding:10px 16px 0}
 }
-/* creator credit */
-.credit{position:absolute;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);opacity:0;white-space:nowrap;
-  font:700 10px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(20,20,20,.62);
-  background:rgba(250,246,238,.9);border:1.5px solid rgba(20,20,20,.14);border-radius:999px;padding:7px 13px 6px;-webkit-locale:"en"}
+/* creator credit: sits under "Entries close" on the white wall, no background */
+.credit{margin-top:clamp(4px,1.2vh,10px);white-space:nowrap;font:700 10px/1.4 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.16em;
+  text-transform:uppercase;color:rgba(20,20,20,.6);-webkit-locale:"en"}
 .credit .heart{color:var(--coral);font-size:1.25em;letter-spacing:0;margin:0 .1em;display:inline-block;animation:beat 2.4s ease-in-out infinite}
 .credit .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .credit a{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
 .credit a:hover,.credit a:focus-visible{color:var(--coral);text-decoration-color:var(--coral)}
 @keyframes beat{0%,70%,100%{transform:scale(1)}78%{transform:scale(1.28)}86%{transform:scale(.96)}}
 @media (prefers-reduced-motion:reduce){.credit .heart{animation:none}}
-@media (min-width:760px){.credit{font-size:11px;bottom:16px}}
-@media (orientation:landscape) and (max-height:520px) and (min-width:560px){.credit{bottom:max(6px,env(safe-area-inset-bottom))}}
+@media (min-width:760px){.credit{font-size:11px}}
 </style>
 </head>
 <body>
@@ -136,6 +134,7 @@ html[lang=ml] .reg{font-family:"Baloo Chettan 2",sans-serif}
       <a class="reg hit" id="reg" href="/register"><span data-i18n="reg">Register now</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
       <span class="due" data-i18n="due">Entries close 14 November</span>
+      <p class="credit" id="credit">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a class="hit" href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
     </div>
   </main>
   <header class="top">
@@ -151,7 +150,6 @@ html[lang=ml] .reg{font-family:"Baloo Chettan 2",sans-serif}
     </div>
   </header>
   <button class="skip hit" id="skip" type="button" data-i18n="skip">Skip intro</button>
-  <p class="credit hit" id="credit">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
 </div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="tip" id="tip" role="tooltip"></div>
@@ -1286,7 +1284,6 @@ function heroRects(){ // what doodles must not cover: the logo and the actual te
   add(plainRect($('#logoWrap')),4);
   const k=$('#kicker'),tf=k.style.transform;k.style.transform='none';const rg=document.createRange();rg.selectNodeContents(k);add(rg.getBoundingClientRect(),6);k.style.transform=tf;
   for(const id of ['meta','cta']){const el=$('#'+id),tf2=el.style.transform;el.style.transform='none';for(const c of el.children)add(c.getBoundingClientRect(),6);el.style.transform=tf2}
-  add($('#credit').getBoundingClientRect(),10);
   return out;
 }
 function headerBottom(){let b=0;for(const id of ['badge','lang','snd']){const r=plainRect($('#'+id));b=Math.max(b,r.bottom)}return b}
@@ -1505,7 +1502,7 @@ function simulateTo(t){
   while(lastSim+SIMDT<=t&&steps<8){const st=lastSim+SIMDT;simStep(st);lastSim=st;steps++}
   if(lastSim+SIMDT<=t)lastSim=t; // drop backlog if the device is slow
 }
-const ui={kick:$('#kicker'),meta:$('#meta'),cta:$('#cta'),badge:$('#badge'),lang:$('#lang'),snd:$('#snd'),skip:$('#skip'),reg:$('#reg'),credit:$('#credit')};
+const ui={kick:$('#kicker'),meta:$('#meta'),cta:$('#cta'),badge:$('#badge'),lang:$('#lang'),snd:$('#snd'),skip:$('#skip'),reg:$('#reg')};
 let chimed=false;
 function frame(t){
   clock=t;
@@ -1536,7 +1533,6 @@ function frame(t){
   up(ui.kick,TL.kicker);up(ui.meta,TL.meta);up(ui.cta,TL.cta);
   const tp=eOut3(seg(t,TL.ui,TL.ui+.5));[ui.badge,ui.lang].forEach(e=>{e.style.opacity=tp;e.style.transform=`translateY(${((1-tp)*-12).toFixed(2)}px)`});
   ui.snd.style.opacity=CAPTURE?0:Math.max(seg(t,.3,.8)*(1-seg(t,TL.ui-.3,TL.ui))*.9,tp);
-  ui.credit.style.opacity=CAPTURE?0:eOut3(seg(t,TL.cta+.3,TL.cta+.9));ui.credit.style.pointerEvents=t>TL.cta+.3?'auto':'none';
   ui.skip.style.opacity=CAPTURE?0:1-seg(t,TL.dock-.2,TL.dock+.2);ui.skip.style.pointerEvents=t<TL.dock?'auto':'none';
   if(t>TL.cta+1.2){const ph=(t-TL.cta)%4.5;const w=ph<.55?Math.sin(ph/.55*Math.PI*3)*(1-ph/.55)*2.6:0;ui.reg.style.rotate=w.toFixed(2)+'deg'}
   if(!chimed&&t>TL.dock){chimed=true;sfxChime()}

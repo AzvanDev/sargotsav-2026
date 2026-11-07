@@ -1118,7 +1118,6 @@ function heroRects(){ // what doodles must not cover: the logo and the actual te
   add(plainRect($('#logoWrap')),4);
   const k=$('#kicker'),tf=k.style.transform;k.style.transform='none';const rg=document.createRange();rg.selectNodeContents(k);add(rg.getBoundingClientRect(),6);k.style.transform=tf;
   for(const id of ['meta','cta']){const el=$('#'+id),tf2=el.style.transform;el.style.transform='none';for(const c of el.children)add(c.getBoundingClientRect(),6);el.style.transform=tf2}
-  add($('#credit').getBoundingClientRect(),10);
   return out;
 }
 function headerBottom(){let b=0;for(const id of ['badge','lang','snd']){const r=plainRect($('#'+id));b=Math.max(b,r.bottom)}return b}
@@ -1337,7 +1336,7 @@ function simulateTo(t){
   while(lastSim+SIMDT<=t&&steps<8){const st=lastSim+SIMDT;simStep(st);lastSim=st;steps++}
   if(lastSim+SIMDT<=t)lastSim=t; // drop backlog if the device is slow
 }
-const ui={kick:$('#kicker'),meta:$('#meta'),cta:$('#cta'),badge:$('#badge'),lang:$('#lang'),snd:$('#snd'),skip:$('#skip'),reg:$('#reg'),credit:$('#credit')};
+const ui={kick:$('#kicker'),meta:$('#meta'),cta:$('#cta'),badge:$('#badge'),lang:$('#lang'),snd:$('#snd'),skip:$('#skip'),reg:$('#reg')};
 let chimed=false;
 function frame(t){
   clock=t;
@@ -1368,7 +1367,6 @@ function frame(t){
   up(ui.kick,TL.kicker);up(ui.meta,TL.meta);up(ui.cta,TL.cta);
   const tp=eOut3(seg(t,TL.ui,TL.ui+.5));[ui.badge,ui.lang].forEach(e=>{e.style.opacity=tp;e.style.transform=`translateY(${((1-tp)*-12).toFixed(2)}px)`});
   ui.snd.style.opacity=CAPTURE?0:Math.max(seg(t,.3,.8)*(1-seg(t,TL.ui-.3,TL.ui))*.9,tp);
-  ui.credit.style.opacity=CAPTURE?0:eOut3(seg(t,TL.cta+.3,TL.cta+.9));ui.credit.style.pointerEvents=t>TL.cta+.3?'auto':'none';
   ui.skip.style.opacity=CAPTURE?0:1-seg(t,TL.dock-.2,TL.dock+.2);ui.skip.style.pointerEvents=t<TL.dock?'auto':'none';
   if(t>TL.cta+1.2){const ph=(t-TL.cta)%4.5;const w=ph<.55?Math.sin(ph/.55*Math.PI*3)*(1-ph/.55)*2.6:0;ui.reg.style.rotate=w.toFixed(2)+'deg'}
   if(!chimed&&t>TL.dock){chimed=true;sfxChime()}
