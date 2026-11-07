@@ -137,6 +137,16 @@ button{cursor:pointer}
 .sync.wait{color:#8a5a00}
 .res .facts{font-size:.86rem}
 .banner{border-radius:12px;padding:10px 12px;font-weight:600;font-size:.9rem;background:#fff6dc;border:1.5px solid #f1d58a;color:#6d4a00}
+/* creator credit */
+.credit{margin:0;text-align:center;font:700 10.5px/1.5 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);-webkit-locale:"en"}
+.credit .heart{color:var(--coral);font-size:1.2em;letter-spacing:0;margin:0 .1em;display:inline-block;animation:beat 2.4s ease-in-out infinite}
+.credit .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.credit a{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.credit a:hover,.credit a:focus-visible{color:var(--coral);text-decoration-color:var(--coral)}
+@keyframes beat{0%,70%,100%{transform:scale(1)}78%{transform:scale(1.28)}86%{transform:scale(.96)}}
+@media (prefers-reduced-motion:reduce){.credit .heart{animation:none}}
+.gate{gap:22px;align-content:center}
+.wrapx>.credit{padding-top:4px}
 </style>
 </head>
 <body>
@@ -154,6 +164,7 @@ button{cursor:pointer}
       <p class="fine">Signed in on the admin desk already? This page uses the same sign-in. Sign in before the day starts: after that, scanning keeps working even if the internet drops.</p>
     </div>
   </form>
+  <p class="credit">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
 </section>
 
 <div id="app" hidden>
@@ -200,6 +211,7 @@ button{cursor:pointer}
       <span id="meEmail"></span>
       <span><a href="admin">Admin desk</a> · <button class="btn sm ghost" type="button" id="signout">Sign out</button></span>
     </div>
+    <p class="credit">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
   </main>
 </div>
 
