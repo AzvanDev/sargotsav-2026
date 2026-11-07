@@ -167,7 +167,17 @@ html[lang=ml] .done h2{font-family:var(--ml);font-size:1.8rem}
 .done .actions .btn{flex:1 1 180px}
 .another{width:min(460px,100%);border-top:2px dashed var(--line);padding-top:16px;display:grid;gap:10px}
 .family{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
-.family span{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600}
+.family span,.family a{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600;color:inherit;text-decoration:none}
+.family a:hover{border-color:var(--ink)}
+.pass .icons.fin{min-height:40px}
+.pass .qrrow{justify-content:space-between;flex-wrap:nowrap;align-items:flex-end;gap:12px}
+.pass .reg.l{margin-left:0;text-align:left;gap:3px}
+.pass .qr{flex:none;width:118px;background:#fff;border-radius:12px;padding:7px;line-height:0}
+.pass .qr svg{display:block;width:100%;height:auto}
+.mailnote{margin:0;max-width:46ch;border-radius:12px;padding:9px 14px;font-weight:600;font-size:.92rem;background:#fff;border:1.5px solid var(--line)}
+.mailnote.ok{background:#e7f3e9;border-color:#bfe0c6;color:#1f5f2b}
+.mailnote.no{background:#fde8e5;border-color:#f3c3bb;color:#9d2a1c}
+.mailnote .spin{display:inline-block;width:14px;height:14px;border:2.5px solid #cfc2ad;border-top-color:var(--ink);border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:6px}
 
 .closed{text-align:center;display:grid;gap:12px;justify-items:center}
 footer{text-align:center;color:var(--muted);font-size:.82rem;display:grid;gap:4px}
@@ -175,6 +185,7 @@ footer a{color:inherit}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js" defer></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -319,11 +330,15 @@ footer a{color:inherit}
       <span class="ev" data-t="passev">Sargotsav 2026 · Artist pass</span>
       <span class="nm" id="fName"></span>
       <div class="row"><span class="cat" id="fCat"></span></div>
+      <div class="icons fin" id="fIcons"></div>
       <div class="perf"></div>
-      <div class="row"><div class="icons" id="fIcons"></div>
-        <div class="reg"><span class="when" data-t="regno">Reg. no.</span><b id="fReg"></b></div></div>
-      <span class="when" data-t="passwhenfull">Sat 14 Nov 2026 · QLS Panayappilly</span>
+      <div class="row qrrow">
+        <div class="reg l"><span class="when" data-t="regno">Reg. no.</span><b id="fReg"></b>
+          <span class="when" data-t="passwhenfull">Sat 14 Nov 2026 · QLS Panayappilly</span></div>
+        <div class="qr" id="fQr" role="img" aria-label="Check-in QR code" hidden></div>
+      </div>
     </div>
+    <p class="mailnote" id="mailNote" role="status" hidden></p>
     <p class="lead" style="max-width:46ch" id="fItemsText"></p>
     <p class="lead" style="max-width:46ch" data-t="showdesk">Show this pass at the registration desk on the day. Keep the registration number safe.</p>
     <div class="actions">
@@ -365,7 +380,10 @@ en:{org:"MSM Kochi Branch",title:"Sargotsav registration",date:"Sat 14 Nov 2026"
  s3label:"Step 3 of 3",s3title:"Check and send",s3lead:"Make sure everything is right. To change items after sending, call the organisers.",
  agree:"I am the student or a parent, and these details are correct.",submit:"Register",
  passev:"Sargotsav 2026 · Artist pass",catq:"Category?",passwhen:"14 Nov · QLS Panayappilly",passnote:"Your pass fills in as you go.",
- regno:"Reg. no.",passwhenfull:"Sat 14 Nov 2026 · QLS Panayappilly",showdesk:"Show this pass at the registration desk on the day. Keep the registration number safe.",
+ regno:"Reg. no.",passwhenfull:"Sat 14 Nov 2026 · QLS Panayappilly",showdesk:"Show this pass at the registration desk on the day. Organisers scan the QR code to mark you present.",
+ mailing:e=>`Emailing your pass to ${e}…`,mailed:e=>`Your pass is in your email (${e}). Check spam if you don't see it.`,
+ mailfail:"We couldn't email the pass. Save it as an image instead, or take a screenshot.",
+ passnotfound:"We couldn't find that pass. Check the link in your email, or call 92499 99743.",
  save:"Save pass as image",share:"Share on WhatsApp",another:"+ Register another child",anotherhint:"Phone and email stay filled in, so it's quicker.",
  closedT:"Registration is closed",closedP:"Entries closed on 10 November. For any questions, call 92499 99743 or 81290 90420.",
  help:"Questions? Call or WhatsApp 92499 99743 (Sijad K.I) or 81290 90420 (Mayis Mahmood)",foot:"Sargotsav · MSM Kochi Branch",
@@ -394,7 +412,10 @@ ml:{org:"MSM കൊച്ചി ശാഖ",title:"സർഗോത്സവ് �
  s3label:"ഘട്ടം 3 / 3",s3title:"പരിശോധിച്ച് അയക്കാം",s3lead:"എല്ലാം ശരിയാണെന്ന് ഉറപ്പുവരുത്തുക. അയച്ചതിനു ശേഷം ഇനങ്ങൾ മാറ്റാൻ സംഘാടകരെ വിളിക്കുക.",
  agree:"ഞാൻ വിദ്യാർത്ഥിയോ രക്ഷിതാവോ ആണ്, ഈ വിവരങ്ങൾ ശരിയാണ്.",submit:"രജിസ്റ്റർ ചെയ്യുക",
  passev:"സർഗോത്സവ് 2026 · ആർട്ടിസ്റ്റ് പാസ്",catq:"വിഭാഗം?",passwhen:"നവം. 14 · QLS പനയപ്പിള്ളി",passnote:"വിവരങ്ങൾ നൽകുമ്പോൾ പാസ് നിറയും.",
- regno:"രജി. നമ്പർ",passwhenfull:"2026 നവംബർ 14 ശനി · QLS പനയപ്പിള്ളി",showdesk:"മത്സര ദിവസം ഈ പാസ് രജിസ്ട്രേഷൻ ഡെസ്കിൽ കാണിക്കുക. രജിസ്ട്രേഷൻ നമ്പർ സൂക്ഷിച്ചു വെക്കുക.",
+ regno:"രജി. നമ്പർ",passwhenfull:"2026 നവംബർ 14 ശനി · QLS പനയപ്പിള്ളി",showdesk:"മത്സര ദിവസം ഈ പാസ് രജിസ്ട്രേഷൻ ഡെസ്കിൽ കാണിക്കുക. സംഘാടകർ QR കോഡ് സ്കാൻ ചെയ്ത് ഹാജർ രേഖപ്പെടുത്തും.",
+ mailing:e=>`പാസ് ${e} എന്ന ഇമെയിലിലേക്ക് അയക്കുന്നു…`,mailed:e=>`പാസ് നിങ്ങളുടെ ഇമെയിലിൽ എത്തി (${e}). കാണുന്നില്ലെങ്കിൽ സ്പാം ഫോൾഡർ നോക്കുക.`,
+ mailfail:"പാസ് ഇമെയിൽ ചെയ്യാനായില്ല. ചിത്രമായി സേവ് ചെയ്യുകയോ സ്ക്രീൻഷോട്ട് എടുക്കുകയോ ചെയ്യുക.",
+ passnotfound:"ഈ പാസ് കണ്ടെത്താനായില്ല. ഇമെയിലിലെ ലിങ്ക് പരിശോധിക്കുക, അല്ലെങ്കിൽ 92499 99743-ൽ വിളിക്കുക.",
  save:"പാസ് ചിത്രമായി സേവ് ചെയ്യുക",share:"വാട്‌സ്ആപ്പിൽ പങ്കിടുക",another:"+ മറ്റൊരു കുട്ടിയെ ചേർക്കുക",anotherhint:"ഫോൺ നമ്പറും ഇമെയിലും വീണ്ടും നൽകേണ്ടതില്ല.",
  closedT:"രജിസ്ട്രേഷൻ അവസാനിച്ചു",closedP:"നവംബർ 10-ന് എൻട്രികൾ അവസാനിച്ചു. സംശയങ്ങൾക്ക് 92499 99743, 81290 90420 എന്നീ നമ്പറുകളിൽ വിളിക്കുക.",
  help:"സംശയങ്ങൾക്ക് വിളിക്കുക / വാട്‌സ്ആപ്പ്: 92499 99743 (സിജാദ് കെ.ഐ), 81290 90420 (മായിസ് മഹമൂദ്)",foot:"സർഗോത്സവ് · MSM കൊച്ചി ശാഖ",
@@ -423,7 +444,7 @@ const qlang=new URLSearchParams(location.search).get("lang");
 let lang=(qlang==="ml"||qlang==="en")?qlang:(store.get("sg_lang")||((navigator.language||"").startsWith("ml")?"ml":"en"));
 if(qlang==="ml"||qlang==="en")store.set("sg_lang",lang);
 let st=Object.assign({name:"",dob:"",gender:"",phone:"",email:"",items:[]},store.get("sg_draft")||{});
-let step=1, result=null;
+let step=1, result=null, mail=null;
 const t=k=>T[lang][k];
 
 function categoryOf(dob){if(!dob)return null;const hit=CATS.find(c=>dob>=c[1]);return hit?hit[0]:"old"}
@@ -534,10 +555,12 @@ $("#submit").onclick=async()=>{
     const j=await r.json().catch(()=>({}));
     if(!r.ok){const code=(j&&j.message)||"";const map={duplicate:"err_duplicate",closed:"err_closed",age:"err_age",items_count:"err_items",items_category:"err_items",invalid:"err_invalid"};
       fe.textContent=t(map[code]||"err_invalid");fe.hidden=false;return}
-    result={reg:j.reg_no,name:st.name.trim(),cat:j.category,gender:j.gender,items:st.items.slice()};
-    const fam=store.get("sg_family")||[];fam.push({n:result.name.split(" ")[0],r:result.reg});store.set("sg_family",fam);
+    result={reg:j.reg_no,name:st.name.trim(),cat:j.category,gender:j.gender,items:st.items.slice(),token:j.token||""};
+    const fam=store.get("sg_family")||[];fam.push({n:result.name.split(" ")[0],r:result.reg,k:result.token});store.set("sg_family",fam);
     store.set("sg_last",result);
+    mail={state:"sending",to:maskEmail(st.email.trim())};
     showDone();
+    if(result.token)sendPass(result.token);else mail=null;
   }catch(e){fe.textContent=t("err_net");fe.hidden=false}
   finally{btn.disabled=false;btn.innerHTML=`<span>${t("submit")}</span>`}
 };
@@ -553,15 +576,55 @@ function renderDone(){
   $("#fIcons").innerHTML=r.items.map(code=>{const it=itemByCode(code);return `<i class="f" style="--c:${colorOf(r.cat,code)}"><svg><use href="#i-${it.icon}"/></svg></i>`}).join("");
   const list=r.items.map(c=>iname(itemByCode(c))).join(", ");
   $("#fItemsText").textContent=T[lang].itemsText(list);
+  renderQr(r.token);renderMail();
   $("#sharePass").href="https://wa.me/?text="+encodeURIComponent(T[lang].shareText(r.name,r.reg,catLabel(r.cat,r.gender),list));
   const fam=store.get("sg_family")||[];
-  $("#family").innerHTML=fam.length>1?`<span style="border:0;background:none">${t("familyT")}</span>`+fam.map(f=>`<span>${esc(f.n)} · ${esc(f.r)}</span>`).join(""):"";
+  $("#family").innerHTML=fam.length>1?`<span style="border:0;background:none">${t("familyT")}</span>`+fam.map(f=>f.k?`<a href="?pass=${encodeURIComponent(f.k)}&lang=${lang}">${esc(f.n)} · ${esc(f.r)}</a>`:`<span>${esc(f.n)} · ${esc(f.r)}</span>`).join(""):"";
 }
 $("#another").onclick=()=>{
-  st={name:"",dob:"",gender:"",phone:st.phone,email:st.email,items:[]};save();result=null;
+  st={name:"",dob:"",gender:"",phone:st.phone,email:st.email,items:[]};save();result=null;mail=null;
+  if(location.search.includes("pass="))history.replaceState(null,"",location.pathname+"?lang="+lang);
   inputs.forEach(k=>$("#"+k).value=st[k]||"");$("#agree").checked=false;
   $("#done").hidden=true;$("#main").hidden=false;go(1);renderAll();$("#name").focus();
 };
+
+/* ---------- check-in QR + emailed pass ---------- */
+// The QR holds only the secret pass token, inside a link to the organisers' check-in page.
+function qrText(token){return /^https?:$/.test(location.protocol)?new URL("checkin.html?t="+token,location.href).href:"SARGOTSAV:"+token}
+function makeQr(token){if(!token||typeof qrcode!=="function")return null;const q=qrcode(0,"M");q.addData(qrText(token));q.make();return q}
+function renderQr(token){
+  const box=$("#fQr");const q=makeQr(token);
+  if(!q){box.hidden=true;if(token&&typeof qrcode!=="function")setTimeout(()=>renderQr(token),400);return}
+  box.innerHTML=q.createSvgTag({cellSize:4,margin:0,scalable:true});box.hidden=false;
+}
+function maskEmail(e){const [u,d]=String(e).split("@");return d?u.slice(0,2)+"•".repeat(Math.max(1,u.length-2))+"@"+d:e}
+function renderMail(){
+  const el=$("#mailNote");if(!mail){el.hidden=true;return}
+  el.hidden=false;el.className="mailnote"+(mail.state==="ok"?" ok":mail.state==="fail"?" no":"");
+  el.innerHTML=mail.state==="sending"?`<i class="spin"></i>${esc(T[lang].mailing(mail.to))}`:
+    mail.state==="ok"?"✓ "+esc(T[lang].mailed(mail.to)):esc(T[lang].mailfail);
+}
+async function sendPass(token){
+  try{
+    const r=await fetch(SUPABASE_URL+"/functions/v1/send-pass",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({token})});
+    const j=await r.json().catch(()=>({}));
+    if(result&&result.token===token)mail=r.ok?{state:"ok",to:j.to||mail.to}:{state:"fail"};
+  }catch(e){if(result&&result.token===token)mail={state:"fail"}}
+  renderMail();
+}
+async function openPass(token){
+  $("#main").hidden=true;
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/get_pass",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({p_token:token})});
+    const j=await r.json().catch(()=>null);
+    if(!r.ok||!j||!j.reg_no)throw new Error("nf");
+    if(!(qlang==="ml"||qlang==="en")&&j.lang!==lang){lang=j.lang==="ml"?"ml":"en";applyLang()}
+    result={reg:j.reg_no,name:j.name,cat:j.category,gender:j.gender,items:j.items||[],token:j.token};mail=null;
+    showDone();
+  }catch(e){
+    $("#closed").hidden=false;$("#closed h2").textContent=t("passnotfound");$("#closed p").textContent=t("help");
+  }
+}
 
 /* save pass as PNG */
 $("#savePass").onclick=async()=>{
@@ -585,6 +648,10 @@ $("#savePass").onclick=async()=>{
   g.font=F(600,ML?34:36,body);r.items.forEach((code,i)=>{const it=itemByCode(code);const yy=y0+360+i*50;g.fillStyle=colorOf(r.cat,code);g.beginPath();g.arc(px+64,yy-12,14,0,7);g.fill();g.fillStyle="#fff";g.fillText(iname(it),px+94,yy)});
   g.fillStyle="#fff";g.globalAlpha=.75;g.font=F(600,26,body);g.fillText(T[lang].regno,px+50,pf+70);g.globalAlpha=1;
   g.font=F(800,72,"'Bricolage Grotesque'");g.fillText(r.reg,px+50,pf+150);
+  const q=makeQr(r.token);if(q){const qs=214,qx=px+pw-50-qs,qy=pf+34,n=q.getModuleCount(),cs=(qs-28)/n;
+    g.fillStyle="#fff";g.beginPath();g.roundRect(qx,qy,qs,qs,22);g.fill();g.fillStyle="#141414";
+    for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(q.isDark(y,x))g.fillRect(Math.floor(qx+14+x*cs),Math.floor(qy+14+y*cs),Math.ceil(cs),Math.ceil(cs))}
+  g.fillStyle="#fff";
   g.globalAlpha=.8;g.font=F(600,28,body);g.fillText(T[lang].passwhenfull,px+50,y0+ph-50);g.globalAlpha=1;
   g.fillStyle="#141414";g.font=F(600,30,body);g.textAlign="center";g.fillText(T[lang].foot,W/2,Math.min(H-40,y0+ph+70));
   const url=c.toDataURL("image/png");const a=document.createElement("a");a.href=url;a.download=`Sargotsav-${r.reg}.png`;document.body.appendChild(a);a.click();a.remove();
@@ -601,8 +668,10 @@ document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>go(+b.dataset.
 function renderAll(){renderGender();renderCatline();renderPass();if(step===2)renderItems();if(step===3)renderReview();if(!$("#done").hidden)renderDone()}
 
 /* ---------- boot ---------- */
-if(new Date()>DEADLINE){$("#main").hidden=true;$("#closed").hidden=false}
+const qpass=new URLSearchParams(location.search).get("pass");
 applyLang();
+if(qpass&&/^[A-Za-z0-9_-]{20,64}$/.test(qpass))openPass(qpass);
+else if(new Date()>DEADLINE){$("#main").hidden=true;$("#closed").hidden=false}
 </script>
 </body>
 </html>
