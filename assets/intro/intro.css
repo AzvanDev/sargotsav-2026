@@ -88,3 +88,15 @@ html[lang=ml] .reg{font-family:"Baloo Chettan 2",sans-serif}
   .reg{min-width:0;padding:14px 22px;font-size:17px}
   .top{padding:10px 16px 0}
 }
+/* creator credit */
+.credit{position:absolute;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);opacity:0;white-space:nowrap;
+  font:700 10px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:rgba(20,20,20,.62);
+  background:rgba(250,246,238,.9);border:1.5px solid rgba(20,20,20,.14);border-radius:999px;padding:7px 13px 6px;-webkit-locale:"en"}
+.credit .heart{color:var(--coral);font-size:1.25em;letter-spacing:0;margin:0 .1em;display:inline-block;animation:beat 2.4s ease-in-out infinite}
+.credit .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.credit a{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.credit a:hover,.credit a:focus-visible{color:var(--coral);text-decoration-color:var(--coral)}
+@keyframes beat{0%,70%,100%{transform:scale(1)}78%{transform:scale(1.28)}86%{transform:scale(.96)}}
+@media (prefers-reduced-motion:reduce){.credit .heart{animation:none}}
+@media (min-width:760px){.credit{font-size:11px;bottom:16px}}
+@media (orientation:landscape) and (max-height:520px) and (min-width:560px){.credit{bottom:max(6px,env(safe-area-inset-bottom))}}

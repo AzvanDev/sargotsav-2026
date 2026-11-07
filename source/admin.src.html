@@ -217,6 +217,16 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
 .addform input{flex:1 1 240px}
 
 .toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;padding:10px 16px;font-weight:600;z-index:30;max-width:calc(100% - 32px)}
+/* creator credit */
+.credit{margin:0;text-align:center;font:700 10.5px/1.5 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);-webkit-locale:"en"}
+.credit .heart{color:var(--coral);font-size:1.2em;letter-spacing:0;margin:0 .1em;display:inline-block;animation:beat 2.4s ease-in-out infinite}
+.credit .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.credit a{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.credit a:hover,.credit a:focus-visible{color:var(--coral);text-decoration-color:var(--coral)}
+@keyframes beat{0%,70%,100%{transform:scale(1)}78%{transform:scale(1.28)}86%{transform:scale(.96)}}
+@media (prefers-reduced-motion:reduce){.credit .heart{animation:none}}
+.gate{gap:22px;align-content:center}
+.main>.credit{padding-top:10px}
 </style>
 </head>
 <body>
@@ -235,6 +245,7 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
       <p class="fine">After 5 wrong tries, sign-in is locked for 15 minutes for that email.</p>
     </div>
   </form>
+  <p class="credit">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
 </section>
 
 <!-- APP -->
@@ -343,6 +354,7 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
         </div>
       </div>
     </section>
+    <p class="credit">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
   </main>
 </div>
 

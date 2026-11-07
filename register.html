@@ -188,6 +188,15 @@ footer{text-align:center;color:var(--muted);font-size:.82rem;display:grid;gap:4p
 footer a{color:inherit}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* creator credit */
+.credit{margin:0;text-align:center;font:700 10.5px/1.5 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);-webkit-locale:"en"}
+.credit .heart{color:var(--coral);font-size:1.2em;letter-spacing:0;margin:0 .1em;display:inline-block;animation:beat 2.4s ease-in-out infinite}
+.credit .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.credit a{color:var(--ink);font-weight:800;text-decoration:underline;text-decoration-color:var(--orange);text-decoration-thickness:2px;text-underline-offset:3px;transition:color .15s,text-decoration-color .15s}
+.credit a:hover,.credit a:focus-visible{color:var(--coral);text-decoration-color:var(--coral)}
+@keyframes beat{0%,70%,100%{transform:scale(1)}78%{transform:scale(1.28)}86%{transform:scale(.96)}}
+@media (prefers-reduced-motion:reduce){.credit .heart{animation:none}}
+.credit.page{margin-top:-6px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js" defer></script>
 </head>
@@ -365,6 +374,7 @@ footer a{color:inherit}
     <span data-t="help">Questions? Call or WhatsApp 92499 99743 (Sijad K.I) or 81290 90420 (Mayis Mahmood)</span>
     <span data-t="foot">Sargotsav · MSM Kochi Branch</span>
   </footer>
+  <p class="credit page">Created with <span class="heart" aria-hidden="true">♥</span><span class="sr">love</span> by <a href="https://www.instagram.com/azvan.sait/" target="_blank" rel="noopener">Azvan Sait</a></p>
 </div>
 
 <script>
