@@ -215,9 +215,6 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
 .tag{font-size:.74rem;font-weight:800;border:1.5px solid var(--ink);border-radius:999px;padding:1px 9px;text-transform:uppercase;letter-spacing:.06em}
 .addform{display:flex;gap:8px;flex-wrap:wrap}
 .addform input{flex:1 1 240px}
-.howto{border:2px dashed var(--line2);border-radius:16px;padding:14px 16px;display:grid;gap:8px;font-size:.9rem;background:var(--paper)}
-.howto ol{margin:0;padding-left:1.2em;display:grid;gap:4px}
-.howto code{background:#fff;border:1px solid var(--line2);border-radius:6px;padding:0 5px;font-size:.85em}
 
 .toast{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;padding:10px 16px;font-weight:600;z-index:30;max-width:calc(100% - 32px)}
 </style>
@@ -334,7 +331,7 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
       <div class="head">
         <div><h2>Admins</h2><p>People who can sign in to this desk and see contestants.</p></div>
       </div>
-      <div class="two">
+      <div>
         <div class="panel">
           <h3>Add an admin</h3>
           <form class="addform" id="addForm" novalidate>
@@ -343,16 +340,6 @@ td .sm{display:block;font-size:.8rem;color:var(--muted)}
           </form>
           <div class="alert" id="addMsg" hidden></div>
           <ul class="adminlist" id="adminList"></ul>
-        </div>
-        <div class="howto">
-          <b>About the shared password</b>
-          <span>Every admin signs in with their own email and the same password. The password is stored only in Supabase, never in this page or in the database.</span>
-          <ol>
-            <li>Open your Supabase project <b>sargotsav-2026</b>.</li>
-            <li>Go to <b>Edge Functions → Secrets</b>.</li>
-            <li>Set <code>ADMIN_PASSWORD</code> to a password of 10 or more characters.</li>
-          </ol>
-          <span>To change it, edit the same secret. New sign-ins use the new password straight away. Removing someone from the list stops them seeing contestants even if they know the password.</span>
         </div>
       </div>
     </section>
@@ -410,7 +397,7 @@ $("#loginForm").addEventListener("submit",async e=>{
     const r=await fetch(SUPABASE_URL+"/functions/v1/admin-login",{method:"POST",headers:{"Content-Type":"application/json",apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok){err.textContent=r.status===429?"Too many wrong tries. Sign-in is locked for 15 minutes for this email.":
-      r.status===503?"The shared password hasn't been set yet. Set ADMIN_PASSWORD in Supabase → Edge Functions → Secrets.":
+      r.status===503?"Sign-in isn't ready yet. Please contact the organiser.":
       r.status===401?"That email isn't an admin, or the password is wrong.":"Sign-in failed. Try again in a minute.";err.hidden=false;return}
     const {error}=await sb.auth.verifyOtp({token_hash:j.token_hash,type:"magiclink"});
     if(error){err.textContent="Sign-in failed: "+error.message;err.hidden=false;return}
