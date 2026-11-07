@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sargotsav 2026 · MSM Kochi Branch</title>
+<meta name="description" content="Sargotsav 2026, the arts festival of MSM Kochi Branch with CIER. Saturday 14 November 2026 at QLS Panayappilly. Register by 10 November.">
+<meta property="og:title" content="Sargotsav 2026 · MSM Kochi Branch">
+<meta property="og:description" content="Sat 14 Nov 2026 · QLS Panayappilly · Kids to Teens. Entries close 10 November.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/intro/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/intro/favicon.png">
+<link rel="apple-touch-icon" href="assets/intro/icon-192.png">
+<meta name="theme-color" content="#F4EFE6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Baloo+Chettan+2:wght@500;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/intro/intro.css">
+</head>
+<body>
+<canvas id="paint" aria-hidden="true"></canvas>
+<div id="stage">
+  <svg id="doodles" aria-hidden="true"></svg>
+  <main class="hero" id="hero">
+    <div class="logoWrap" id="logoWrap"><canvas id="logoCv" role="img" aria-label="Sargotsav 2026"></canvas></div>
+    <div class="kicker" id="kicker" data-i18n="kicker">the stage awakens…</div>
+    <div class="meta" id="meta">
+      <span class="chip c1" data-i18n="date">Sat · 14 Nov 2026</span>
+      <span class="chip c2" data-i18n="venue">QLS Panayappilly</span>
+      <span class="chip c3" data-i18n="cats">Kids to Teens</span>
+    </div>
+    <div class="cta" id="cta">
+      <a class="reg hit" id="reg" href="register.html"><span data-i18n="reg">Register now</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></a>
+      <span class="due" data-i18n="due">Entries close 10 November</span>
+    </div>
+  </main>
+  <header class="top">
+    <div class="badge" id="badge"><img src="assets/intro/cier.webp" alt="CIER"><span data-i18n="org">MSM Kochi Branch<small>with CIER</small></span></div>
+    <div class="ctrls">
+      <button class="snd hit" id="snd" type="button" aria-label="Sound" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path id="sndOn" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" opacity="0"/><path id="sndOff" d="M17 10l4 4M21 10l-4 4"/></svg>
+      </button>
+      <div class="pill hit" id="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="ml" aria-pressed="false">മല</button>
+      </div>
+    </div>
+  </header>
+  <button class="skip hit" id="skip" type="button" data-i18n="skip">Skip intro</button>
+</div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="tip" id="tip" role="tooltip"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetT">
+  <h3 id="sheetT" data-i18n="sheetT">Registration opens here</h3>
+  <p data-i18n="sheetP">The form (category, items, age check) comes in the next step.</p>
+  <button type="button" id="sheetClose" data-i18n="close">Close</button>
+</div>
+
+<script src="assets/intro/logo-data.js"></script>
+<script src="assets/intro/intro.js"></script>
+</body>
+</html>

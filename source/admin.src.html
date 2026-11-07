@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sargotsav Entries</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/webp;base64,__LOGO__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Baloo+Chettan+2:wght@500;700&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<style>
+:root{--paper:#FFF8EC;--ink:#141414;--muted:#6b6358;--line:#e3d6c1;--white:#fff;--orange:#F57A22;--coral:#F14F3A;--green:#308E40;--blue:#4581CB;--indigo:#4F5BA3;--magenta:#E2246E;--yellow:#FFC23A;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;--ml:"Baloo Chettan 2",sans-serif;color-scheme:light}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--display);font-size:15px;line-height:1.45;
+  padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.app{max-width:1200px;margin:0 auto;padding-block:16px 48px;display:grid;gap:18px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top img{width:58px}
+.top h1{margin:0;font-size:1.3rem;font-weight:800;flex:1}
+.top .who{font-size:.85rem;color:var(--muted)}
+.btn{border:2px solid var(--ink);border-radius:12px;padding:8px 14px;font-weight:700;background:var(--ink);color:#fff;display:inline-flex;gap:6px;align-items:center}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.danger{background:var(--coral);border-color:var(--coral)}
+.btn.sm{padding:4px 10px;font-size:.82rem;border-radius:9px}
+.card{background:#fff;border:2px solid var(--ink);border-radius:18px;padding:18px}
+/* login */
+.login{max-width:380px;margin:10vh auto 0;display:grid;gap:14px}
+.login h2{margin:0}
+.f{display:grid;gap:4px}.f label{font-weight:700;font-size:.9rem}
+.f input,select,.search{border:2px solid #cfc2ad;border-radius:12px;padding:9px 12px;background:var(--paper);min-height:42px}
+.msg{border-radius:10px;padding:9px 12px;font-weight:600;font-size:.9rem}
+.msg.err{background:#fde8e5;color:#9d2a1c}.msg.ok{background:#e7f3e9;color:#1f5f2b}
+/* stats */
+.tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.tile{background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px 12px;display:grid;gap:2px;text-align:left}
+.tile b{font-size:1.6rem;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.1}
+.tile span{font-size:.8rem;color:var(--muted);font-weight:600}
+.tile small{font-size:.74rem;color:var(--muted)}
+.tile.total{background:var(--ink);color:#fff;border-color:var(--ink)}.tile.total span{color:#ddd}
+.tile[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tile i{display:block;height:4px;border-radius:4px;background:var(--c);margin-bottom:4px}
+@media (max-width:860px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:460px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* layout */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+@media (max-width:960px){.cols{grid-template-columns:1fr}}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.search{flex:1 1 220px;min-width:0}
+.count{font-size:.85rem;color:var(--muted);margin-left:auto}
+.tablewrap{overflow-x:auto;border:2px solid var(--line);border-radius:14px;background:#fff}
+table{border-collapse:collapse;width:100%;min-width:820px;font-size:.88rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#fbf5ea;position:sticky;top:0}
+tbody tr:hover{background:#fffaf1}
+td.reg{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+td a{color:inherit}
+.pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:.76rem;font-weight:700;color:#fff;background:var(--c);white-space:nowrap}
+.items{display:flex;flex-wrap:wrap;gap:4px}
+.items span{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.8rem}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+/* item counts */
+.side{display:grid;gap:12px}
+.side h3{margin:0;font-size:1rem}
+.ilist{display:grid;gap:2px;max-height:70vh;overflow:auto}
+.irow{display:grid;grid-template-columns:1fr auto;gap:8px;padding:5px 6px;border-radius:8px;border:0;background:none;text-align:left;font-size:.85rem}
+.irow:hover{background:var(--paper)}
+.irow[aria-pressed="true"]{background:var(--yellow)}
+.irow b{font-variant-numeric:tabular-nums}
+.irow .bar{grid-column:1/-1;height:4px;border-radius:4px;background:var(--line);overflow:hidden}
+.irow .bar i{display:block;height:100%;background:var(--c)}
+.igroup{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:8px 0 2px}
+/* confirm */
+.confirm{position:fixed;inset:0;background:rgba(20,20,20,.45);display:grid;place-items:center;padding:16px;z-index:10}
+.confirm .card{max-width:380px;display:grid;gap:12px}
+.confirm .card div{display:flex;gap:8px;justify-content:flex-end}
+.note{font-size:.82rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <img src="data:image/webp;base64,__LOGO__" alt="">
+    <h1>Sargotsav 2026 · Entries</h1>
+    <span class="who" id="who"></span>
+    <button class="btn ghost sm" id="logout" hidden>Sign out</button>
+  </header>
+
+  <form class="card login" id="login" hidden>
+    <h2>Organiser sign in</h2>
+    <div class="f"><label for="em">Email</label><input id="em" type="email" autocomplete="username" required></div>
+    <div class="f"><label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password" required></div>
+    <div class="msg err" id="loginErr" hidden></div>
+    <button class="btn" type="submit" id="loginBtn">Sign in</button>
+    <p class="note">Only organisers on the admin list can see entries. Ask the site owner to add you.</p>
+  </form>
+
+  <div class="card" id="noaccess" hidden>
+    <h2 style="margin:0 0 6px">You're signed in, but not on the admin list</h2>
+    <p class="note" style="margin:0">Ask the site owner to add your email to the <b>admins</b> table in Supabase, then reload this page.</p>
+  </div>
+
+  <div id="dash" hidden style="display:grid;gap:18px">
+    <div class="tiles" id="tiles"></div>
+    <div class="cols">
+      <div style="display:grid;gap:10px;min-width:0">
+        <div class="toolbar">
+          <input class="search" id="q" type="search" placeholder="Search name, phone, reg. no. or email">
+          <select id="fg" aria-label="Gender"><option value="">Boys + girls</option><option value="boy">Boys</option><option value="girl">Girls</option></select>
+          <button class="btn ghost sm" id="clear">Clear filters</button>
+          <button class="btn ghost sm" id="refresh">↻ Refresh</button>
+          <button class="btn sm" id="csv">Download CSV</button>
+        </div>
+        <div class="toolbar"><span id="filterNote" class="note"></span><span class="count" id="count"></span></div>
+        <div class="msg err" id="loadErr" hidden></div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Reg. no.</th><th>Name</th><th>Category</th><th>Items</th><th>DOB</th><th>Phone</th><th>Email</th><th>Registered</th><th></th></tr></thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <aside class="card side">
+        <h3>Entries per item</h3>
+        <p class="note" style="margin:0">Tap an item to list only its students.</p>
+        <div class="ilist" id="ilist"></div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<div class="confirm" id="confirm" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="cT">
+    <h3 id="cT" style="margin:0">Delete this entry?</h3>
+    <p id="cP" style="margin:0"></p>
+    <div><button class="btn ghost" id="cNo">Keep</button><button class="btn danger" id="cYes">Delete</button></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://frkcdmvezjrqybbifnod.supabase.co";
+const SUPABASE_KEY="sb_publishable_o8Qqrd0GmPvTxCWPb9o7Nw_UW1KVlQe";
+const ITEMS=__ITEMS__;
+const CAT=[["kids","Kids","#F57A22"],["children","Children","#308E40"],["subjunior","Sub-Junior","#4581CB"],["junior","Junior","#4F5BA3"],["teens","Teens","#E2246E"]];
+const CATN=Object.fromEntries(CAT.map(c=>[c[0],c[1]])),CATC=Object.fromEntries(CAT.map(c=>[c[0],c[2]]));
+const INAME={};for(const k in ITEMS)ITEMS[k].forEach(i=>INAME[i.code]=i.en);
+const $=s=>document.querySelector(s);
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let rows=[],f={cat:"",item:"",g:"",q:""};
+
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function div(r){return CATN[r.category]+((r.category==="junior"||r.category==="teens")?(r.gender==="boy"?" Boys":" Girls"):"")}
+function fmtD(d){const [y,m,dd]=d.split("-");return `${dd}/${m}/${y}`}
+function fmtT(t){return new Date(t).toLocaleString("en-IN",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit",timeZone:"Asia/Kolkata"})}
+
+async function boot(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){$("#login").hidden=false;$("#dash").hidden=true;$("#noaccess").hidden=true;$("#logout").hidden=true;$("#who").textContent="";return}
+  $("#login").hidden=true;$("#logout").hidden=false;$("#who").textContent=session.user.email;
+  const {data:adm}=await sb.from("admins").select("email").limit(1);
+  if(!adm||!adm.length){$("#noaccess").hidden=false;$("#dash").hidden=true;return}
+  $("#noaccess").hidden=true;$("#dash").hidden=false;load();
+}
+$("#login").addEventListener("submit",async e=>{e.preventDefault();const b=$("#loginBtn");b.disabled=true;$("#loginErr").hidden=true;
+  const {error}=await sb.auth.signInWithPassword({email:$("#em").value.trim(),password:$("#pw").value});
+  b.disabled=false;if(error){$("#loginErr").textContent=error.message==="Invalid login credentials"?"That email and password don't match. Check them and try again.":error.message;$("#loginErr").hidden=false;return}
+  boot()});
+$("#logout").onclick=async()=>{await sb.auth.signOut();rows=[];boot()};
+
+async function load(){
+  $("#loadErr").hidden=true;
+  const {data,error}=await sb.from("registrations").select("*").order("created_at",{ascending:false}).range(0,9999);
+  if(error){$("#loadErr").textContent="Couldn't load entries: "+error.message;$("#loadErr").hidden=false;return}
+  rows=data||[];render();
+}
+$("#refresh").onclick=load;
+
+function filtered(){const q=f.q.toLowerCase().trim();return rows.filter(r=>(!f.cat||r.category===f.cat)&&(!f.g||r.gender===f.g)&&(!f.item||r.items.includes(f.item))&&
+  (!q||[r.name,r.phone,r.reg_no,r.email].some(v=>String(v).toLowerCase().includes(q))))}
+
+function render(){
+  // tiles
+  const byCat=c=>rows.filter(r=>r.category===c);
+  $("#tiles").innerHTML=`<button class="tile total" data-cat="" aria-pressed="${!f.cat}"><span>All entries</span><b>${rows.length}</b><small>${rows.reduce((a,r)=>a+r.items.length,0)} item entries</small></button>`+
+    CAT.map(([k,n,c])=>{const l=byCat(k);const split=(k==="junior"||k==="teens")?`${l.filter(r=>r.gender==="boy").length} boys · ${l.filter(r=>r.gender==="girl").length} girls`:"&nbsp;";
+      return `<button class="tile" style="--c:${c}" data-cat="${k}" aria-pressed="${f.cat===k}"><i></i><span>${n}</span><b>${l.length}</b><small>${split}</small></button>`}).join("");
+  $("#tiles").querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{f.cat=b.dataset.cat;if(f.item&&f.cat&&!ITEMS[f.cat].some(i=>i.code===f.item))f.item="";render()});
+  // item list
+  const base=rows.filter(r=>!f.g||r.gender===f.g);
+  const cats=f.cat?CAT.filter(c=>c[0]===f.cat):CAT;
+  let max=1;const cnt={};base.forEach(r=>r.items.forEach(i=>{cnt[i]=(cnt[i]||0)+1;max=Math.max(max,cnt[i])}));
+  $("#ilist").innerHTML=cats.map(([k,n,c])=>`<div class="igroup">${n}</div>`+ITEMS[k].map(it=>`<button class="irow" data-item="${it.code}" aria-pressed="${f.item===it.code}"><span>${esc(it.en)}</span><b>${cnt[it.code]||0}</b><span class="bar"><i style="width:${(cnt[it.code]||0)/max*100}%;--c:${c}"></i></span></button>`).join("")).join("");
+  $("#ilist").querySelectorAll("[data-item]").forEach(b=>b.onclick=()=>{f.item=f.item===b.dataset.item?"":b.dataset.item;render()});
+  // table
+  const list=filtered();
+  $("#count").textContent=`${list.length} of ${rows.length} shown`;
+  const notes=[f.cat&&CATN[f.cat],f.g&&(f.g==="boy"?"Boys":"Girls"),f.item&&INAME[f.item],f.q&&`“${f.q}”`].filter(Boolean);
+  $("#filterNote").textContent=notes.length?"Showing: "+notes.join(" · "):"";
+  $("#rows").innerHTML=list.length?list.map(r=>`<tr><td class="reg">${esc(r.reg_no)}</td><td><b>${esc(r.name)}</b></td>
+    <td><span class="pill" style="--c:${CATC[r.category]}">${esc(div(r))}</span></td>
+    <td><div class="items">${r.items.map(i=>`<span>${esc(INAME[i]||i)}</span>`).join("")}</div></td>
+    <td class="num">${fmtD(r.dob)}</td><td class="num"><a href="tel:+91${esc(r.phone)}">${esc(r.phone)}</a></td><td>${esc(r.email)}</td>
+    <td class="num">${fmtT(r.created_at)}</td><td><button class="btn ghost sm" data-del="${r.id}" aria-label="Delete ${esc(r.name)}">Delete</button></td></tr>`).join("")
+    :`<tr><td colspan="9" class="empty">${rows.length?"No entries match these filters.":"No entries yet. They'll appear here as soon as someone registers."}</td></tr>`;
+  $("#rows").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>askDelete(rows.find(r=>r.id===b.dataset.del)));
+}
+$("#q").addEventListener("input",e=>{f.q=e.target.value;render()});
+$("#fg").addEventListener("change",e=>{f.g=e.target.value;render()});
+$("#clear").onclick=()=>{f={cat:"",item:"",g:"",q:""};$("#q").value="";$("#fg").value="";render()};
+
+let pending=null;
+function askDelete(r){pending=r;$("#cP").textContent=`${r.reg_no} · ${r.name} (${div(r)}). This can't be undone.`;$("#confirm").hidden=false;$("#cNo").focus()}
+$("#cNo").onclick=()=>{$("#confirm").hidden=true;pending=null};
+$("#cYes").onclick=async()=>{if(!pending)return;const id=pending.id;$("#confirm").hidden=true;
+  const {error}=await sb.from("registrations").delete().eq("id",id);
+  if(error){$("#loadErr").textContent="Couldn't delete: "+error.message;$("#loadErr").hidden=false;return}
+  rows=rows.filter(r=>r.id!==id);render()};
+
+$("#csv").onclick=()=>{
+  const list=filtered();const head=["Reg no","Name","Category","Gender","Division","Item 1","Item 2","Item 3","DOB","Phone","Email","Language","Registered (IST)"];
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const lines=[head.map(q).join(",")].concat(list.map(r=>[r.reg_no,r.name,CATN[r.category],r.gender==="boy"?"Boy":"Girl",div(r),INAME[r.items[0]]||"",INAME[r.items[1]]||"",INAME[r.items[2]]||"",fmtD(r.dob),r.phone,r.email,r.lang==="ml"?"Malayalam":"English",fmtT(r.created_at)].map(q).join(",")));
+  const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sargotsav-entries-${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();a.remove();
+};
+sb.auth.onAuthStateChange((ev)=>{if(ev==="SIGNED_OUT")boot()});
+boot();
+</script>
+</body>
+</html>

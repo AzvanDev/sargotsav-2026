@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sargotsav 2026 Registration</title>
+<meta name="description" content="Register for Sargotsav 2026, MSM Kochi Branch. Sat 14 Nov 2026, QLS Panayappilly. Entries close 10 Nov.">
+<meta name="theme-color" content="#FFF8EC">
+<link rel="icon" href="data:image/webp;base64,__LOGO__">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat:wght@600;700&family=Baloo+Chettan+2:wght@500;600;700;800&display=swap">
+<style>
+:root{
+  --paper:#FFF8EC; --ink:#141414; --muted:#6b6358; --line:#e3d6c1; --white:#fff;
+  --orange:#F57A22; --coral:#F14F3A; --green:#308E40; --teal:#2B7D60; --blue:#4581CB;
+  --indigo:#4F5BA3; --mint:#9DD1C0; --magenta:#E2246E; --yellow:#FFC23A; --wa:#25A55F;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --hand:"Caveat","Comic Sans MS",cursive;
+  --ml:"Baloo Chettan 2","Noto Sans Malayalam","Kartika",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--display);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top,0) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0) max(16px,env(safe-area-inset-left,0px));}
+html[lang=ml] body{font-family:var(--ml);-webkit-locale:"en";font-language-override:"dflt"}
+html[lang=ml] .hand-en{font-family:var(--ml)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+.app{max-width:980px;margin:0 auto;padding-block:16px 48px;display:grid;gap:20px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:14px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand img{width:74px;height:auto;flex:none}
+.brand div{display:grid;line-height:1.15;min-width:0}
+.brand strong{font-size:1.05rem;font-weight:800}
+.brand span{font-size:.82rem;color:var(--muted)}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;flex:none}
+.seg button{border:0;background:transparent;padding:5px 11px;font-weight:700;font-size:.85rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.seg .mlb{font-family:var(--ml)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--white);border-radius:999px;padding:4px 12px;font-size:.84rem;font-weight:600}
+.chip.hot{border-color:var(--coral);color:var(--coral)}
+
+/* layout */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+.side{position:sticky;top:16px;display:grid;gap:12px}
+@media (max-width:820px){.grid{grid-template-columns:1fr}.side{position:static;order:-1}}
+
+/* pass */
+.pass{position:relative;border-radius:20px;background:var(--ink);color:#fff;padding:16px 18px 14px;display:grid;gap:8px;overflow:hidden;isolation:isolate;
+  -webkit-mask:radial-gradient(circle at 0 64%,transparent 11px,#000 11.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 64%,transparent 11px,#000 11.5px) right/51% 100% no-repeat;
+  mask:radial-gradient(circle at 0 64%,transparent 11px,#000 11.5px) left/51% 100% no-repeat,radial-gradient(circle at 100% 64%,transparent 11px,#000 11.5px) right/51% 100% no-repeat}
+.pass .s1,.pass .s2,.pass .s3{position:absolute;z-index:-1;border-radius:46% 54% 60% 40%/50% 45% 55% 50%}
+.pass .s1{right:-34px;top:-40px;width:130px;height:130px;background:var(--magenta)}
+.pass .s2{right:52px;top:-26px;width:52px;height:52px;border-radius:50%;background:var(--yellow)}
+.pass .s3{left:-30px;bottom:-40px;width:90px;height:90px;background:var(--blue);opacity:.85}
+.pass .ev{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;opacity:.82;font-family:var(--display)}
+.pass .nm{font-family:var(--hand);font-size:2.1rem;line-height:.95;min-height:2rem;overflow-wrap:anywhere;padding-right:70px}
+html[lang=ml] .pass .nm{font-family:var(--hand)}
+.pass .nm.ghost{opacity:.35}
+.pass .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pass .cat{font-size:.74rem;font-weight:800;border:2px solid var(--yellow);color:var(--yellow);border-radius:7px;padding:1px 8px;transform:rotate(-3deg);text-transform:uppercase;letter-spacing:.05em;font-family:var(--display)}
+html[lang=ml] .pass .cat{font-family:var(--ml);text-transform:none;letter-spacing:0;font-size:.82rem}
+.pass .cat.ghost{border-style:dashed;color:#8d8d8d;border-color:#5b5b5b;transform:none}
+.pass .cat.pop{animation:stamp .45s cubic-bezier(.2,1.6,.4,1)}
+@keyframes stamp{from{transform:rotate(-3deg) scale(1.9);opacity:0}}
+.pass .perf{border-top:2px dashed #4d4d4d;margin:6px -18px 2px}
+.pass .icons{display:flex;gap:8px}
+.pass .icons i{width:40px;height:40px;border-radius:12px;border:2px dashed #555;display:grid;place-items:center}
+.pass .icons i.f{border:0;background:var(--c);animation:drop .4s cubic-bezier(.2,1.5,.4,1)}
+@keyframes drop{from{transform:translateY(-14px) scale(.6);opacity:0}}
+.pass .icons svg{width:24px;height:24px;color:var(--ink)}
+.pass .reg{margin-left:auto;text-align:right;display:grid;line-height:1.1}
+.pass .reg b{font-size:1.15rem;letter-spacing:.04em;font-family:var(--display)}
+.pass .when{font-size:.7rem;opacity:.75;font-family:var(--display);letter-spacing:.06em;text-transform:uppercase}
+html[lang=ml] .pass .when{font-family:var(--ml);text-transform:none;letter-spacing:0;font-size:.78rem}
+.passnote{font-size:.85rem;color:var(--muted);text-align:center}
+
+/* card / steps */
+.card{background:var(--white);border:2px solid var(--ink);border-radius:22px;padding:20px;display:grid;gap:18px;box-shadow:6px 6px 0 var(--ink)}
+@media (max-width:480px){.card{padding:16px;box-shadow:4px 4px 0 var(--ink)}}
+.stepper{display:flex;gap:6px;align-items:center}
+.stepper span{flex:1;height:6px;border-radius:6px;background:var(--line)}
+.stepper span.on{background:var(--orange)}
+.stepper span.done{background:var(--green)}
+.steplabel{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+html[lang=ml] .steplabel{letter-spacing:0;text-transform:none;font-size:.9rem}
+h1,h2{margin:0;line-height:1.1;text-wrap:balance}
+h2{font-size:1.6rem;font-weight:800;letter-spacing:-.01em}
+html[lang=ml] h2{letter-spacing:0;font-size:1.5rem}
+.lead{margin:0;color:var(--muted)}
+
+/* fields */
+.fields{display:grid;gap:14px}
+.f{display:grid;gap:5px}
+.f label,.f .lab{font-weight:700;font-size:.92rem}
+.f input{width:100%;border:2px solid #cfc2ad;border-radius:14px;padding:11px 13px;background:var(--paper);font-size:1rem;min-height:48px}
+.f input:focus{border-color:var(--ink);outline:none;box-shadow:0 0 0 3px var(--yellow)}
+.f.bad input{border-color:var(--coral)}
+.err{color:var(--coral);font-size:.84rem;font-weight:600;min-height:0}
+.hint{font-size:.84rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.two.stack{grid-template-columns:1fr}}
+.gbtn{border:2px solid #cfc2ad;background:var(--paper);border-radius:14px;padding:11px;font-weight:700;min-height:48px}
+.gbtn[aria-pressed="true"]{border-color:var(--ink);background:var(--yellow)}
+.catline{border-radius:14px;padding:10px 12px;font-weight:600;font-size:.92rem;display:flex;gap:10px;align-items:center}
+.catline.ok{background:#e7f3e9;color:#1f5f2b}
+.catline.no{background:#fde8e5;color:#9d2a1c}
+.catline b{font-size:1.05rem}
+
+/* items */
+.counter{display:flex;align-items:center;gap:8px;font-weight:700}
+.counter i{width:20px;height:20px;border:2px solid var(--ink);border-radius:50%;display:inline-block;transition:background .2s}
+.counter i.f{background:var(--green)}
+.stubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.stub{display:flex;align-items:center;gap:10px;border-radius:14px;background:var(--paper);border:2px solid #d8ccb8;padding:9px 11px;font-weight:600;text-align:left;min-height:52px;transition:background .15s,border-color .15s,transform .15s}
+.stub svg{width:24px;height:24px;flex:none}
+.stub span{flex:1;line-height:1.2;font-size:.95rem}
+.stub .tick{width:24px;height:24px;border-radius:50%;border:2px solid #b9ab94;flex:none;display:grid;place-items:center}
+.stub.sel{background:var(--c);border-color:var(--ink)}
+.stub.sel .tick{background:var(--ink);border-color:var(--ink)}
+.stub.sel .tick::after{content:"";width:10px;height:6px;border:solid #fff;border-width:0 0 2.5px 2.5px;transform:translateY(-1px) rotate(-45deg)}
+.stub.dim{opacity:.5}
+.stub.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.call{border:2px dashed #c9bba5;border-radius:14px;padding:12px 14px;display:grid;gap:8px;font-size:.92rem;background:var(--paper)}
+.call .nums{display:flex;flex-wrap:wrap;gap:8px}
+.call a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--ink);font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:5px 12px;background:#fff}
+.call a.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+
+/* review */
+.review{display:grid;gap:0;border:2px solid var(--line);border-radius:16px;overflow:hidden}
+.review div{display:grid;grid-template-columns:120px 1fr auto;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);align-items:baseline}
+.review div:last-child{border-bottom:0}
+.review dt{font-size:.82rem;color:var(--muted);font-weight:600;margin:0}
+.review dd{margin:0;font-weight:700;overflow-wrap:anywhere}
+.review button{border:0;background:none;color:var(--blue);font-weight:700;font-size:.85rem;padding:0}
+@media (max-width:420px){.review div{grid-template-columns:1fr auto}.review dt{grid-column:1/-1}}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:.9rem}
+.agree input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--green)}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{border:2px solid var(--ink);border-radius:14px;padding:12px 18px;font-weight:800;background:var(--ink);color:#fff;min-height:50px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.btn.primary{flex:1}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn.wa{background:var(--wa);border-color:var(--wa)}
+.btn.orange{background:var(--orange);border-color:var(--ink)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn .spin{width:18px;height:18px;border:3px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.formerr{background:#fde8e5;color:#9d2a1c;border-radius:12px;padding:10px 12px;font-weight:600;font-size:.92rem}
+
+/* done */
+.done{display:grid;gap:18px;justify-items:center;text-align:center}
+.done .big{width:min(420px,100%);transform:rotate(-2deg);animation:passin .8s cubic-bezier(.2,1.4,.4,1)}
+@keyframes passin{from{transform:rotate(-14deg) translateY(60px) scale(.8);opacity:0}}
+.done h2{font-family:var(--hand);font-size:2.4rem;font-weight:700}
+html[lang=ml] .done h2{font-family:var(--ml);font-size:1.8rem}
+.done .actions{width:min(460px,100%)}
+.done .actions .btn{flex:1 1 180px}
+.another{width:min(460px,100%);border-top:2px dashed var(--line);padding-top:16px;display:grid;gap:10px}
+.family{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.family span{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:600}
+
+.closed{text-align:center;display:grid;gap:12px;justify-items:center}
+footer{text-align:center;color:var(--muted);font-size:.82rem;display:grid;gap:4px}
+footer a{color:inherit}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-pencil" viewBox="0 0 32 32"><path d="M6 26l3-9L22 4l6 6-13 13z M9 17l6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-brush" viewBox="0 0 32 32"><path d="M27 5L15 17 M15 17c-3-1-6 1-6 4 0 3-2 4-4 5 5 1 11 0 12-5 0-2-1-3-2-4z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 32 32"><rect x="12" y="4" width="8" height="14" rx="4" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M8 15a8 8 0 0016 0 M16 23v5 M11 28h10" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-book" viewBox="0 0 32 32"><path d="M16 9c-3-3-8-3-11-2v17c3-1 8-1 11 2 3-3 8-3 11-2V7c-3-1-8-1-11 2z M16 9v17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/></symbol>
+    <symbol id="i-note" viewBox="0 0 32 32"><path d="M12 24V7l14-3v17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="9" cy="24" r="3.5" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="23" cy="21" r="3.5" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 32 32"><path d="M6 27h20 M8 22l2-6 12-11 4 4-12 11z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-talk" viewBox="0 0 32 32"><path d="M5 8a3 3 0 013-3h16a3 3 0 013 3v10a3 3 0 01-3 3H14l-6 5v-5a3 3 0 01-3-3z M10 11h12 M10 15h8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 32 32"><path d="M11 20c-3-2-4-5-4-8a9 9 0 0118 0c0 3-1 6-4 8v3H11z M12 27h8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 32 32"><path d="M4 11a2 2 0 012-2h4l2-3h8l2 3h4a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="16" cy="17" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/></symbol>
+    <symbol id="i-film" viewBox="0 0 32 32"><rect x="7" y="3" width="18" height="26" rx="3" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M14 12v8l6-4z" fill="currentColor"/></symbol>
+    <symbol id="i-screen" viewBox="0 0 32 32"><rect x="4" y="5" width="24" height="17" rx="2" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M12 27h8 M16 22v5 M9 17l5-5 3 3 3-3 3 3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <img src="data:image/webp;base64,__LOGO__" alt="Sargotsav 2026" width="74" height="53" id="logoImg">
+      <div><strong data-t="org">MSM Kochi Branch</strong><span data-t="title">Sargotsav registration</span></div>
+    </div>
+    <div class="seg" role="group" aria-label="Language">
+      <button type="button" id="lang-en" aria-pressed="true">EN</button>
+      <button type="button" id="lang-ml" class="mlb" aria-pressed="false">മലയാളം</button>
+    </div>
+  </header>
+
+  <div class="chips">
+    <span class="chip" data-t="date">Sat 14 Nov 2026</span>
+    <span class="chip" data-t="venue">QLS Panayappilly</span>
+    <span class="chip hot" id="countdown"></span>
+  </div>
+
+  <main class="grid" id="main">
+    <section>
+      <!-- STEP 1 -->
+      <form class="card" id="step1" novalidate>
+        <div class="stepper" aria-hidden="true"><span class="on"></span><span></span><span></span></div>
+        <div style="display:grid;gap:6px">
+          <span class="steplabel" data-t="s1label">Step 1 of 3</span>
+          <h2 data-t="s1title">About the student</h2>
+          <p class="lead" data-t="s1lead">We use the date of birth to find the right category.</p>
+        </div>
+        <div class="fields">
+          <div class="f" id="f-name">
+            <label for="name" data-t="name">Student's full name</label>
+            <input id="name" name="name" autocomplete="name" maxlength="80" required>
+            <span class="err" data-err="name"></span>
+          </div>
+          <div class="f" id="f-dob">
+            <label for="dob" data-t="dob">Date of birth</label>
+            <input id="dob" name="dob" type="date" min="2000-01-01" required>
+            <span class="err" data-err="dob"></span>
+            <div class="catline" id="catline" hidden></div>
+          </div>
+          <div class="f" id="f-gender">
+            <span class="lab" id="glab" data-t="gender">Gender</span>
+            <div class="two" role="group" aria-labelledby="glab">
+              <button type="button" class="gbtn" data-g="boy" aria-pressed="false" data-t="boy">Boy</button>
+              <button type="button" class="gbtn" data-g="girl" aria-pressed="false" data-t="girl">Girl</button>
+            </div>
+            <span class="err" data-err="gender"></span>
+          </div>
+          <div class="f" id="f-phone">
+            <label for="phone" data-t="phone">Phone number (WhatsApp)</label>
+            <input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="98470 12345" maxlength="16" required>
+            <span class="err" data-err="phone"></span>
+          </div>
+          <div class="f" id="f-email">
+            <label for="email" data-t="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" placeholder="name@gmail.com" maxlength="120" required>
+            <span class="err" data-err="email"></span>
+          </div>
+        </div>
+        <div class="actions"><button class="btn primary orange" type="submit" data-t="next1">Next: choose items →</button></div>
+      </form>
+
+      <!-- STEP 2 -->
+      <div class="card" id="step2" hidden>
+        <div class="stepper" aria-hidden="true"><span class="done"></span><span class="on"></span><span></span></div>
+        <div style="display:grid;gap:6px">
+          <span class="steplabel" data-t="s2label">Step 2 of 3</span>
+          <h2 id="s2title"></h2>
+          <p class="lead" data-t="s2lead">Pick up to 3 individual items. Only the items for your category are shown.</p>
+        </div>
+        <div class="counter" id="counter" aria-live="polite"></div>
+        <div class="stubs" id="stubs"></div>
+        <div class="call">
+          <span data-t="callnote">For group items, or to compete in a higher category, call or WhatsApp:</span>
+          <div class="nums">
+            <a href="tel:+919249999743">📞 92499 99743 <small data-t="sijad">(Sijad K.I)</small></a>
+            <a class="wa" href="https://wa.me/919249999743" target="_blank" rel="noopener">WhatsApp</a>
+          </div>
+        </div>
+        <span class="err" id="itemsErr"></span>
+        <div class="actions">
+          <button class="btn ghost" type="button" data-back="1" data-t="back">← Back</button>
+          <button class="btn primary orange" type="button" id="next2" data-t="next2">Next: check →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="card" id="step3" hidden>
+        <div class="stepper" aria-hidden="true"><span class="done"></span><span class="done"></span><span class="on"></span></div>
+        <div style="display:grid;gap:6px">
+          <span class="steplabel" data-t="s3label">Step 3 of 3</span>
+          <h2 data-t="s3title">Check and send</h2>
+          <p class="lead" data-t="s3lead">Make sure everything is right. You can't change items yourself after sending.</p>
+        </div>
+        <dl class="review" id="review"></dl>
+        <label class="agree"><input type="checkbox" id="agree"><span data-t="agree">I am the student or a parent, and these details are correct.</span></label>
+        <div class="formerr" id="formErr" hidden></div>
+        <div class="actions">
+          <button class="btn ghost" type="button" data-back="2" data-t="back">← Back</button>
+          <button class="btn primary" type="button" id="submit"><span data-t="submit">Register</span></button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side" id="side">
+      <div class="pass" id="livePass" aria-label="Artist pass preview">
+        <i class="s1"></i><i class="s2"></i><i class="s3"></i>
+        <span class="ev" data-t="passev">Sargotsav 2026 · Artist pass</span>
+        <span class="nm ghost" id="pName">Your name</span>
+        <div class="row"><span class="cat ghost" id="pCat" data-t="catq">Category?</span></div>
+        <div class="perf"></div>
+        <div class="row"><div class="icons" id="pIcons"><i></i><i></i><i></i></div>
+          <div class="reg"><span class="when" data-t="passwhen">14 Nov · QLS Panayappilly</span></div></div>
+      </div>
+      <p class="passnote" data-t="passnote">Your pass fills in as you go.</p>
+    </aside>
+  </main>
+
+  <!-- DONE -->
+  <section class="done" id="done" hidden>
+    <h2 id="doneTitle"></h2>
+    <div class="pass big" id="finalPass">
+      <i class="s1"></i><i class="s2"></i><i class="s3"></i>
+      <span class="ev" data-t="passev">Sargotsav 2026 · Artist pass</span>
+      <span class="nm" id="fName"></span>
+      <div class="row"><span class="cat" id="fCat"></span></div>
+      <div class="perf"></div>
+      <div class="row"><div class="icons" id="fIcons"></div>
+        <div class="reg"><span class="when" data-t="regno">Reg. no.</span><b id="fReg"></b></div></div>
+      <span class="when" data-t="passwhenfull">Sat 14 Nov 2026 · QLS Panayappilly</span>
+    </div>
+    <p class="lead" style="max-width:46ch" id="fItemsText"></p>
+    <p class="lead" style="max-width:46ch" data-t="showdesk">Show this pass at the registration desk on the day. Keep the registration number safe.</p>
+    <div class="actions">
+      <button class="btn ghost" type="button" id="savePass" data-t="save">Save pass as image</button>
+      <a class="btn wa" id="sharePass" target="_blank" rel="noopener" data-t="share">Share on WhatsApp</a>
+    </div>
+    <div class="another">
+      <div class="family" id="family"></div>
+      <button class="btn orange" type="button" id="another" data-t="another">+ Register another child</button>
+      <span class="hint" data-t="anotherhint">Phone and email stay filled in, so it's quicker.</span>
+    </div>
+  </section>
+
+  <section class="card closed" id="closed" hidden>
+    <h2 data-t="closedT">Registration is closed</h2>
+    <p class="lead" data-t="closedP">Entries closed on 10 November. For any questions, call 92499 99743 or 81290 90420.</p>
+  </section>
+
+  <footer>
+    <span data-t="help">Questions? Call or WhatsApp 92499 99743 (Sijad K.I) or 81290 90420 (Mayis Mahmood)</span>
+    <span data-t="foot">Sargotsav · MSM Kochi Branch</span>
+  </footer>
+</div>
+
+<script>
+const SUPABASE_URL="https://frkcdmvezjrqybbifnod.supabase.co";
+const SUPABASE_KEY="sb_publishable_o8Qqrd0GmPvTxCWPb9o7Nw_UW1KVlQe";
+const DEADLINE=new Date("2026-11-10T23:59:59+05:30");
+const ITEMS=__ITEMS__;
+const COLORS=["#FFC23A","#9DD1C0","#F57A22","#E2246E","#4581CB","#308E40","#F14F3A","#4F5BA3","#2B7D60"];
+const CATS=[["kids","2019-06-01"],["children","2017-06-01"],["subjunior","2014-06-01"],["junior","2011-06-01"],["teens","2006-06-01"]];
+const CATNAME={en:{kids:"Kids",children:"Children",subjunior:"Sub-Junior",junior:"Junior",teens:"Teens"},ml:{kids:"കിഡ്‌സ്",children:"ചിൽഡ്രൻ",subjunior:"സബ്ജൂനിയർ",junior:"ജൂനിയർ",teens:"ടീൻസ്"}};
+const T={
+en:{org:"MSM Kochi Branch",title:"Sargotsav registration",date:"Sat 14 Nov 2026",venue:"QLS Panayappilly",
+ s1label:"Step 1 of 3",s1title:"About the student",s1lead:"We use the date of birth to find the right category.",
+ name:"Student's full name",dob:"Date of birth",gender:"Gender",boy:"Boy",girl:"Girl",phone:"Phone number (WhatsApp)",email:"Email",
+ next1:"Next: choose items →",s2label:"Step 2 of 3",s2lead:"Pick up to 3 individual items. Only the items for your category are shown.",
+ callnote:"For group items, or to compete in a higher category, call or WhatsApp:",sijad:"(Sijad K.I)",back:"← Back",next2:"Next: check →",
+ s3label:"Step 3 of 3",s3title:"Check and send",s3lead:"Make sure everything is right. To change items after sending, call the organisers.",
+ agree:"I am the student or a parent, and these details are correct.",submit:"Register",
+ passev:"Sargotsav 2026 · Artist pass",catq:"Category?",passwhen:"14 Nov · QLS Panayappilly",passnote:"Your pass fills in as you go.",
+ regno:"Reg. no.",passwhenfull:"Sat 14 Nov 2026 · QLS Panayappilly",showdesk:"Show this pass at the registration desk on the day. Keep the registration number safe.",
+ save:"Save pass as image",share:"Share on WhatsApp",another:"+ Register another child",anotherhint:"Phone and email stay filled in, so it's quicker.",
+ closedT:"Registration is closed",closedP:"Entries closed on 10 November. For any questions, call 92499 99743 or 81290 90420.",
+ help:"Questions? Call or WhatsApp 92499 99743 (Sijad K.I) or 81290 90420 (Mayis Mahmood)",foot:"Sargotsav · MSM Kochi Branch",
+ yourName:"Your name",boys:"Boys",girls:"Girls",
+ s2title:c=>`${c}: choose your items`,
+ picked:n=>`${n} of 3 picked`,
+ days:d=>d>1?`Entries close 10 Nov · ${d} days left`:d===1?"Entries close 10 Nov · last day tomorrow":"Last day to register: today",
+ ageOk:(a,c)=>`Age ${a} on 1 June 2026 → <b>${c}</b>`,
+ ageOld:"Sargotsav is for students born on or after 1 June 2006.",
+ e_name:"Please write the student's full name.",e_dob:"Please enter the date of birth.",e_dobfuture:"The date of birth can't be in the future.",
+ e_gender:"Please choose boy or girl.",e_phone:"Please enter a 10-digit mobile number.",e_email:"Please enter a valid email address.",
+ e_items:"Pick at least one item.",max3:"You can pick only 3 items. Tap one you picked to remove it.",
+ r_name:"Name",r_dob:"Date of birth",r_gender:"Gender",r_phone:"Phone",r_email:"Email",r_cat:"Category",r_items:"Items",edit:"Edit",
+ err_duplicate:"This student is already registered with this phone number. Call 92499 99743 if something needs to change.",
+ err_closed:"Registration closed on 10 November.",err_age:"This date of birth doesn't fit any Sargotsav category.",
+ err_items:"Those items don't match the category. Please go back and pick again.",err_invalid:"Some details look wrong. Please check the phone number and email.",
+ err_net:"Couldn't reach the server. Check your internet connection and try again.",agreeErr:"Please tick the box to confirm.",
+ doneT:n=>`See you on stage, ${n}!`,itemsText:l=>`Registered for: ${l}`,
+ shareText:(n,r,c,l)=>`${n} is registered for Sargotsav 2026! 🎨\nReg. no: ${r}\nCategory: ${c}\nItems: ${l}\nSat 14 Nov · QLS Panayappilly\n\nRegister before 10 Nov: ${location.href.split('#')[0]}`,
+ familyT:"Registered from this phone:",sending:"Sending…"},
+ml:{org:"MSM കൊച്ചി ശാഖ",title:"സർഗോത്സവ് രജിസ്ട്രേഷൻ",date:"2026 നവംബർ 14 ശനി",venue:"QLS പനയപ്പിള്ളി",
+ s1label:"ഘട്ടം 1 / 3",s1title:"വിദ്യാർത്ഥിയുടെ വിവരങ്ങൾ",s1lead:"ജനന തീയതി നോക്കി ശരിയായ വിഭാഗം കണ്ടെത്തും.",
+ name:"വിദ്യാർത്ഥിയുടെ പൂർണ്ണ പേര്",dob:"ജനന തീയതി",gender:"ലിംഗം",boy:"ആൺകുട്ടി",girl:"പെൺകുട്ടി",phone:"ഫോൺ നമ്പർ (വാട്‌സ്ആപ്പ്)",email:"ഇമെയിൽ",
+ next1:"അടുത്തത്: ഇനങ്ങൾ →",s2label:"ഘട്ടം 2 / 3",s2lead:"പരമാവധി 3 വ്യക്തിഗത ഇനങ്ങൾ തിരഞ്ഞെടുക്കാം. നിങ്ങളുടെ വിഭാഗത്തിലെ ഇനങ്ങൾ മാത്രമേ കാണിക്കൂ.",
+ callnote:"ഗ്രൂപ്പിനങ്ങൾക്കും മുകളിലെ കാറ്റഗറിയിൽ മത്സരിക്കാനും ഈ നമ്പറിൽ വിളിക്കുക, അല്ലെങ്കിൽ വാട്‌സ്ആപ്പ് അയക്കുക:",sijad:"(സിജാദ് കെ.ഐ)",back:"← തിരികെ",next2:"അടുത്തത്: പരിശോധിക്കാം →",
+ s3label:"ഘട്ടം 3 / 3",s3title:"പരിശോധിച്ച് അയക്കാം",s3lead:"എല്ലാം ശരിയാണെന്ന് ഉറപ്പുവരുത്തുക. അയച്ചതിനു ശേഷം ഇനങ്ങൾ മാറ്റാൻ സംഘാടകരെ വിളിക്കുക.",
+ agree:"ഞാൻ വിദ്യാർത്ഥിയോ രക്ഷിതാവോ ആണ്, ഈ വിവരങ്ങൾ ശരിയാണ്.",submit:"രജിസ്റ്റർ ചെയ്യുക",
+ passev:"സർഗോത്സവ് 2026 · ആർട്ടിസ്റ്റ് പാസ്",catq:"വിഭാഗം?",passwhen:"നവം. 14 · QLS പനയപ്പിള്ളി",passnote:"വിവരങ്ങൾ നൽകുമ്പോൾ പാസ് നിറയും.",
+ regno:"രജി. നമ്പർ",passwhenfull:"2026 നവംബർ 14 ശനി · QLS പനയപ്പിള്ളി",showdesk:"മത്സര ദിവസം ഈ പാസ് രജിസ്ട്രേഷൻ ഡെസ്കിൽ കാണിക്കുക. രജിസ്ട്രേഷൻ നമ്പർ സൂക്ഷിച്ചു വെക്കുക.",
+ save:"പാസ് ചിത്രമായി സേവ് ചെയ്യുക",share:"വാട്‌സ്ആപ്പിൽ പങ്കിടുക",another:"+ മറ്റൊരു കുട്ടിയെ ചേർക്കുക",anotherhint:"ഫോൺ നമ്പറും ഇമെയിലും വീണ്ടും നൽകേണ്ടതില്ല.",
+ closedT:"രജിസ്ട്രേഷൻ അവസാനിച്ചു",closedP:"നവംബർ 10-ന് എൻട്രികൾ അവസാനിച്ചു. സംശയങ്ങൾക്ക് 92499 99743, 81290 90420 എന്നീ നമ്പറുകളിൽ വിളിക്കുക.",
+ help:"സംശയങ്ങൾക്ക് വിളിക്കുക / വാട്‌സ്ആപ്പ്: 92499 99743 (സിജാദ് കെ.ഐ), 81290 90420 (മായിസ് മഹമൂദ്)",foot:"സർഗോത്സവ് · MSM കൊച്ചി ശാഖ",
+ yourName:"നിങ്ങളുടെ പേര്",boys:"ആൺ",girls:"പെൺ",
+ s2title:c=>`${c}: ഇനങ്ങൾ തിരഞ്ഞെടുക്കൂ`,
+ picked:n=>`3-ൽ ${n} തിരഞ്ഞെടുത്തു`,
+ days:d=>d>1?`നവംബർ 10-ന് മുമ്പ് എൻട്രി ഉറപ്പുവരുത്തൂ · ${d} ദിവസം ബാക്കി`:d===1?"നാളെ അവസാന ദിവസം":"ഇന്ന് അവസാന ദിവസം",
+ ageOk:(a,c)=>`2026 ജൂൺ 1-ന് ${a} വയസ്സ് → <b>${c}</b>`,
+ ageOld:"2006 ജൂൺ 1-നോ അതിനു ശേഷമോ ജനിച്ചവർക്കാണ് സർഗോത്സവ്.",
+ e_name:"വിദ്യാർത്ഥിയുടെ പൂർണ്ണ പേര് എഴുതുക.",e_dob:"ജനന തീയതി നൽകുക.",e_dobfuture:"ജനന തീയതി ഭാവിയിലാകാൻ പാടില്ല.",
+ e_gender:"ആൺകുട്ടി / പെൺകുട്ടി തിരഞ്ഞെടുക്കുക.",e_phone:"10 അക്ക മൊബൈൽ നമ്പർ നൽകുക.",e_email:"ശരിയായ ഇമെയിൽ വിലാസം നൽകുക.",
+ e_items:"കുറഞ്ഞത് ഒരു ഇനമെങ്കിലും തിരഞ്ഞെടുക്കുക.",max3:"3 ഇനങ്ങൾ മാത്രമേ തിരഞ്ഞെടുക്കാൻ പറ്റൂ. മാറ്റാൻ, തിരഞ്ഞെടുത്ത ഒന്നിൽ തൊടുക.",
+ r_name:"പേര്",r_dob:"ജനന തീയതി",r_gender:"ലിംഗം",r_phone:"ഫോൺ",r_email:"ഇമെയിൽ",r_cat:"വിഭാഗം",r_items:"ഇനങ്ങൾ",edit:"മാറ്റുക",
+ err_duplicate:"ഈ വിദ്യാർത്ഥി ഈ ഫോൺ നമ്പറിൽ നേരത്തെ രജിസ്റ്റർ ചെയ്തിട്ടുണ്ട്. മാറ്റങ്ങൾക്ക് 92499 99743-ൽ വിളിക്കുക.",
+ err_closed:"നവംബർ 10-ന് രജിസ്ട്രേഷൻ അവസാനിച്ചു.",err_age:"ഈ ജനന തീയതി ഒരു വിഭാഗത്തിലും പെടുന്നില്ല.",
+ err_items:"ഈ ഇനങ്ങൾ വിഭാഗവുമായി ചേരുന്നില്ല. തിരികെ പോയി വീണ്ടും തിരഞ്ഞെടുക്കുക.",err_invalid:"ചില വിവരങ്ങൾ തെറ്റാണ്. ഫോൺ നമ്പറും ഇമെയിലും പരിശോധിക്കുക.",
+ err_net:"സെർവറുമായി ബന്ധപ്പെടാനായില്ല. ഇന്റർനെറ്റ് പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കുക.",agreeErr:"ഉറപ്പുവരുത്താൻ ബോക്സിൽ ടിക്ക് ചെയ്യുക.",
+ doneT:n=>`വേദിയിൽ കാണാം, ${n}!`,itemsText:l=>`രജിസ്റ്റർ ചെയ്ത ഇനങ്ങൾ: ${l}`,
+ shareText:(n,r,c,l)=>`${n} സർഗോത്സവ് 2026-ൽ രജിസ്റ്റർ ചെയ്തു! 🎨\nരജി. നമ്പർ: ${r}\nവിഭാഗം: ${c}\nഇനങ്ങൾ: ${l}\n2026 നവംബർ 14 ശനി · QLS പനയപ്പിള്ളി\n\nനവംബർ 10-ന് മുമ്പ് രജിസ്റ്റർ ചെയ്യൂ: ${location.href.split('#')[0]}`,
+ familyT:"ഈ ഫോണിൽ നിന്ന് രജിസ്റ്റർ ചെയ്തവർ:",sending:"അയക്കുന്നു…"}
+};
+
+const $=s=>document.querySelector(s);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const qlang=new URLSearchParams(location.search).get("lang");
+let lang=(qlang==="ml"||qlang==="en")?qlang:(store.get("sg_lang")||((navigator.language||"").startsWith("ml")?"ml":"en"));
+if(qlang==="ml"||qlang==="en")store.set("sg_lang",lang);
+let st=Object.assign({name:"",dob:"",gender:"",phone:"",email:"",items:[]},store.get("sg_draft")||{});
+let step=1, result=null;
+const t=k=>T[lang][k];
+
+function categoryOf(dob){if(!dob)return null;const hit=CATS.find(c=>dob>=c[1]);return hit?hit[0]:"old"}
+function ageOn(dob){const d=new Date(dob+"T00:00:00");let a=2026-d.getFullYear();if(d.getMonth()>5||(d.getMonth()===5&&d.getDate()>1))a--;return a}
+function catLabel(cat,g,l=lang){if(!cat||cat==="old")return "";let s=CATNAME[l][cat];if((cat==="junior"||cat==="teens")&&g)s+=" · "+T[l][g==="boy"?"boys":"girls"];return s}
+function itemsFor(cat){return ITEMS[cat]||[]}
+function itemByCode(code){for(const k in ITEMS){const i=ITEMS[k].find(x=>x.code===code);if(i)return i}return null}
+function colorOf(cat,code){const i=itemsFor(cat).findIndex(x=>x.code===code);return COLORS[(i<0?0:i)%COLORS.length]}
+function iname(it,l=lang){return l==="ml"?it.ml:it.en}
+function save(){store.set("sg_draft",st)}
+function normPhone(p){const d=(p||"").replace(/\D/g,"");return d.slice(-10)}
+function fmtDate(d){if(!d)return "";const [y,m,dd]=d.split("-");return `${dd}/${m}/${y}`}
+
+/* ---------- language ---------- */
+function applyLang(){
+  document.documentElement.lang=lang;
+  $("#lang-en").setAttribute("aria-pressed",lang==="en");$("#lang-ml").setAttribute("aria-pressed",lang==="ml");
+  document.querySelectorAll("[data-t]").forEach(el=>{const v=T[lang][el.dataset.t];if(typeof v==="string")el.textContent=v});
+  countdown();renderAll();
+}
+$("#lang-en").onclick=()=>{lang="en";store.set("sg_lang",lang);applyLang()};
+$("#lang-ml").onclick=()=>{lang="ml";store.set("sg_lang",lang);applyLang()};
+
+function countdown(){
+  const now=new Date();const el=$("#countdown");
+  if(now>DEADLINE){el.hidden=true;return}
+  const ist=d=>new Date(d.getTime()+5.5*3600e3).toISOString().slice(0,10);
+  const days=Math.round((new Date(ist(DEADLINE))-new Date(ist(now)))/864e5);
+  el.textContent=T[lang].days(days);
+}
+
+/* ---------- pass ---------- */
+function renderPass(){
+  const cat=categoryOf(st.dob);
+  const nm=$("#pName");nm.textContent=st.name.trim()||t("yourName");nm.classList.toggle("ghost",!st.name.trim());
+  const pc=$("#pCat");const lab=catLabel(cat,st.gender);
+  if(lab){if(pc.textContent!==lab){pc.textContent=lab;pc.classList.remove("ghost","pop");void pc.offsetWidth;pc.classList.add("pop")}}
+  else{pc.textContent=t("catq");pc.classList.add("ghost");pc.classList.remove("pop")}
+  const prev=$("#pIcons").querySelectorAll("i.f").length;
+  $("#pIcons").innerHTML=[0,1,2].map(k=>{const code=st.items[k];if(!code)return "<i></i>";const it=itemByCode(code);
+    return `<i class="f" style="--c:${colorOf(cat,code)};${k<prev?'animation:none':''}"><svg><use href="#i-${it.icon}"/></svg></i>`}).join("");
+}
+
+/* ---------- step 1 ---------- */
+const inputs=["name","dob","phone","email"];
+inputs.forEach(k=>{const el=$("#"+k);el.value=st[k]||"";el.addEventListener("input",()=>{st[k]=el.value;
+  if(k==="dob"){const c=categoryOf(st.dob);st.items=st.items.filter(code=>itemsFor(c).some(i=>i.code===code))}
+  clearErr(k);save();renderPass();if(k==="dob")renderCatline()})});
+$("#dob").max=new Date().toISOString().slice(0,10);
+document.querySelectorAll(".gbtn").forEach(b=>b.onclick=()=>{st.gender=b.dataset.g;save();clearErr("gender");renderGender();renderPass()});
+function renderGender(){document.querySelectorAll(".gbtn").forEach(b=>b.setAttribute("aria-pressed",b.dataset.g===st.gender))}
+function renderCatline(){
+  const el=$("#catline");const c=categoryOf(st.dob);
+  if(!st.dob||st.dob>$("#dob").max){el.hidden=true;return}
+  el.hidden=false;
+  if(c==="old"){el.className="catline no";el.textContent=t("ageOld")}
+  else{el.className="catline ok";el.innerHTML=T[lang].ageOk(ageOn(st.dob),CATNAME[lang][c])}
+}
+function setErr(k,msg){const f=$("#f-"+k);if(f)f.classList.toggle("bad",!!msg);const e=document.querySelector(`[data-err="${k}"]`);if(e)e.textContent=msg||""}
+function clearErr(k){setErr(k,"")}
+function validate1(){
+  let ok=true,first=null;const bad=(k,m)=>{setErr(k,m);ok=false;first=first||k};
+  if(st.name.trim().replace(/\s+/g," ").length<2)bad("name",t("e_name"));
+  if(!st.dob)bad("dob",t("e_dob"));else if(st.dob>$("#dob").max)bad("dob",t("e_dobfuture"));else if(categoryOf(st.dob)==="old")bad("dob",t("ageOld"));
+  if(!st.gender)bad("gender",t("e_gender"));
+  if(!/^[6-9]\d{9}$/.test(normPhone(st.phone))||st.phone.replace(/\D/g,"").length<10)bad("phone",t("e_phone"));
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(st.email.trim()))bad("email",t("e_email"));
+  if(first){const el=$("#"+first)||document.querySelector(`[data-g]`);el.focus();el.scrollIntoView({block:"center",behavior:"smooth"})}
+  return ok;
+}
+$("#step1").addEventListener("submit",e=>{e.preventDefault();if(validate1())go(2)});
+
+/* ---------- step 2 ---------- */
+function renderItems(){
+  const cat=categoryOf(st.dob);if(!cat||cat==="old")return;
+  $("#s2title").textContent=T[lang].s2title(catLabel(cat,st.gender));
+  const n=st.items.length;
+  $("#counter").innerHTML=[0,1,2].map(k=>`<i class="${k<n?'f':''}"></i>`).join("")+`<span>${T[lang].picked(n)}</span>`;
+  const box=$("#stubs");box.innerHTML="";
+  itemsFor(cat).forEach((it,i)=>{const sel=st.items.includes(it.code);
+    const b=document.createElement("button");b.type="button";b.className="stub"+(sel?" sel":"")+(!sel&&n>=3?" dim":"");
+    b.style.setProperty("--c",COLORS[i%COLORS.length]);b.setAttribute("aria-pressed",sel);
+    b.innerHTML=`<svg><use href="#i-${it.icon}"/></svg><span>${iname(it)}</span><i class="tick"></i>`;
+    b.onclick=()=>{if(st.items.includes(it.code)){st.items=st.items.filter(c=>c!==it.code)}
+      else if(st.items.length>=3){b.classList.remove("shake");void b.offsetWidth;b.classList.add("shake");$("#itemsErr").textContent=t("max3");return}
+      else st.items.push(it.code);
+      $("#itemsErr").textContent="";save();renderItems();renderPass()};
+    box.appendChild(b)});
+}
+$("#next2").onclick=()=>{if(!st.items.length){$("#itemsErr").textContent=t("e_items");return}go(3)};
+
+/* ---------- step 3 ---------- */
+function renderReview(){
+  const cat=categoryOf(st.dob);
+  const rows=[["r_name",st.name.trim(),1],["r_dob",fmtDate(st.dob),1],["r_gender",st.gender?t(st.gender):"",1],["r_cat",catLabel(cat,st.gender),0],
+    ["r_items",st.items.map(c=>iname(itemByCode(c))).join(", "),2],["r_phone",normPhone(st.phone),1],["r_email",st.email.trim(),1]];
+  $("#review").innerHTML=rows.map(([k,v,s])=>`<div><dt>${t(k)}</dt><dd>${esc(v)}</dd>${s?`<button type="button" data-goto="${s}">${t("edit")}</button>`:"<span></span>"}</div>`).join("");
+  $("#review").querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>go(+b.dataset.goto));
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+$("#submit").onclick=async()=>{
+  const fe=$("#formErr");fe.hidden=true;
+  if(!$("#agree").checked){fe.textContent=t("agreeErr");fe.hidden=false;return}
+  const btn=$("#submit");btn.disabled=true;btn.innerHTML=`<i class="spin"></i><span>${t("sending")}</span>`;
+  try{
+    const r=await fetch(SUPABASE_URL+"/rest/v1/rpc/register_entry",{method:"POST",headers:{"apikey":SUPABASE_KEY,"Content-Type":"application/json"},
+      body:JSON.stringify({p_name:st.name.trim(),p_dob:st.dob,p_gender:st.gender,p_phone:normPhone(st.phone),p_email:st.email.trim(),p_items:st.items,p_lang:lang})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok){const code=(j&&j.message)||"";const map={duplicate:"err_duplicate",closed:"err_closed",age:"err_age",items_count:"err_items",items_category:"err_items",invalid:"err_invalid"};
+      fe.textContent=t(map[code]||"err_invalid");fe.hidden=false;return}
+    result={reg:j.reg_no,name:st.name.trim(),cat:j.category,gender:j.gender,items:st.items.slice()};
+    const fam=store.get("sg_family")||[];fam.push({n:result.name.split(" ")[0],r:result.reg});store.set("sg_family",fam);
+    store.set("sg_last",result);
+    showDone();
+  }catch(e){fe.textContent=t("err_net");fe.hidden=false}
+  finally{btn.disabled=false;btn.innerHTML=`<span>${t("submit")}</span>`}
+};
+
+/* ---------- done ---------- */
+function showDone(){
+  $("#main").hidden=true;$("#done").hidden=false;renderDone();window.scrollTo({top:0,behavior:"smooth"});
+}
+function renderDone(){
+  if(!result)return;const r=result;
+  $("#doneTitle").textContent=T[lang].doneT(r.name.split(" ")[0]);
+  $("#fName").textContent=r.name;$("#fCat").textContent=catLabel(r.cat,r.gender);$("#fReg").textContent=r.reg;
+  $("#fIcons").innerHTML=r.items.map(code=>{const it=itemByCode(code);return `<i class="f" style="--c:${colorOf(r.cat,code)}"><svg><use href="#i-${it.icon}"/></svg></i>`}).join("");
+  const list=r.items.map(c=>iname(itemByCode(c))).join(", ");
+  $("#fItemsText").textContent=T[lang].itemsText(list);
+  $("#sharePass").href="https://wa.me/?text="+encodeURIComponent(T[lang].shareText(r.name,r.reg,catLabel(r.cat,r.gender),list));
+  const fam=store.get("sg_family")||[];
+  $("#family").innerHTML=fam.length>1?`<span style="border:0;background:none">${t("familyT")}</span>`+fam.map(f=>`<span>${esc(f.n)} · ${esc(f.r)}</span>`).join(""):"";
+}
+$("#another").onclick=()=>{
+  st={name:"",dob:"",gender:"",phone:st.phone,email:st.email,items:[]};save();result=null;
+  inputs.forEach(k=>$("#"+k).value=st[k]||"");$("#agree").checked=false;
+  $("#done").hidden=true;$("#main").hidden=false;go(1);renderAll();$("#name").focus();
+};
+
+/* save pass as PNG */
+$("#savePass").onclick=async()=>{
+  const r=result;if(!r)return;
+  try{await Promise.all(["700 64px Caveat","800 40px 'Bricolage Grotesque'","700 40px 'Baloo Chettan 2'"].map(f=>document.fonts.load(f)))}catch(e){}
+  const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+  const ML=lang==="ml";const F=(w,s,fam)=>`${w} ${s}px ${fam}`;const body=ML?"'Baloo Chettan 2'":"'Bricolage Grotesque'";
+  g.fillStyle="#FFF8EC";g.fillRect(0,0,W,H);
+  const blob=(x,y,s,col)=>{g.fillStyle=col;g.beginPath();for(let i=0;i<=24;i++){const a=i/24*Math.PI*2,rr=s*(1+.18*Math.sin(a*5+x)+.08*Math.cos(a*3+y));const px=x+Math.cos(a)*rr,py=y+Math.sin(a)*rr;i?g.lineTo(px,py):g.moveTo(px,py)}g.fill()};
+  blob(980,120,140,"#9DD1C0");blob(90,1250,150,"#FFC23A");blob(1010,1260,70,"#F57A22");
+  const logo=$("#logoImg");const lw=360,lh=lw*logo.naturalHeight/logo.naturalWidth;g.drawImage(logo,(W-lw)/2,60,lw,lh);
+  const y0=60+lh+40,px=90,pw=W-180,ph=790,pf=y0+520;
+  g.save();g.beginPath();g.roundRect(px,y0,pw,ph,44);g.clip();g.fillStyle="#141414";g.fillRect(px,y0,pw,ph);
+  blob(px+pw-40,y0-10,170,"#E2246E");g.fillStyle="#FFC23A";g.beginPath();g.arc(px+pw-230,y0+30,60,0,7);g.fill();blob(px+pw+10,y0+ph+30,120,"#4581CB");g.restore();
+  g.fillStyle="#FFF8EC";[0,1].forEach(s=>{g.beginPath();g.arc(s?px+pw:px,pf,26,0,7);g.fill()});
+  g.fillStyle="#fff";g.globalAlpha=.8;g.font=F(600,26,body);g.fillText(T[lang].passev.toUpperCase(),px+50,y0+80);g.globalAlpha=1;
+  g.font=F(700,ML?84:96,"Caveat, "+body);let nm=r.name;while(g.measureText(nm).width>pw-160&&nm.length>3)nm=nm.slice(0,-1);g.fillText(nm===r.name?nm:nm+"…",px+50,y0+190);
+  const cl=catLabel(r.cat,r.gender);g.save();g.translate(px+50,y0+250);g.rotate(-.05);g.font=F(800,34,body);const cw=g.measureText(ML?cl:cl.toUpperCase()).width;
+  g.strokeStyle="#FFC23A";g.lineWidth=5;g.beginPath();g.roundRect(0,0,cw+36,60,12);g.stroke();g.fillStyle="#FFC23A";g.fillText(ML?cl:cl.toUpperCase(),18,43);g.restore();
+  g.setLineDash([14,10]);g.strokeStyle="#555";g.lineWidth=4;g.beginPath();g.moveTo(px+30,pf);g.lineTo(px+pw-30,pf);g.stroke();g.setLineDash([]);
+  g.font=F(600,ML?34:36,body);r.items.forEach((code,i)=>{const it=itemByCode(code);const yy=y0+360+i*50;g.fillStyle=colorOf(r.cat,code);g.beginPath();g.arc(px+64,yy-12,14,0,7);g.fill();g.fillStyle="#fff";g.fillText(iname(it),px+94,yy)});
+  g.fillStyle="#fff";g.globalAlpha=.75;g.font=F(600,26,body);g.fillText(T[lang].regno,px+50,pf+70);g.globalAlpha=1;
+  g.font=F(800,72,"'Bricolage Grotesque'");g.fillText(r.reg,px+50,pf+150);
+  g.globalAlpha=.8;g.font=F(600,28,body);g.fillText(T[lang].passwhenfull,px+50,y0+ph-50);g.globalAlpha=1;
+  g.fillStyle="#141414";g.font=F(600,30,body);g.textAlign="center";g.fillText(T[lang].foot,W/2,Math.min(H-40,y0+ph+70));
+  const url=c.toDataURL("image/png");const a=document.createElement("a");a.href=url;a.download=`Sargotsav-${r.reg}.png`;document.body.appendChild(a);a.click();a.remove();
+};
+
+/* ---------- navigation ---------- */
+function go(n){
+  if(n>=2&&!validate1()){n=1}
+  step=n;["step1","step2","step3"].forEach((id,i)=>$("#"+id).hidden=i+1!==n);
+  renderAll();
+  if(window.innerWidth<820){const top=$("#side").getBoundingClientRect().bottom+window.scrollY-8;if(window.scrollY>top)window.scrollTo({top,behavior:"smooth"})}
+}
+document.querySelectorAll("[data-back]").forEach(b=>b.onclick=()=>go(+b.dataset.back));
+function renderAll(){renderGender();renderCatline();renderPass();if(step===2)renderItems();if(step===3)renderReview();if(!$("#done").hidden)renderDone()}
+
+/* ---------- boot ---------- */
+if(new Date()>DEADLINE){$("#main").hidden=true;$("#closed").hidden=false}
+applyLang();
+</script>
+</body>
+</html>
