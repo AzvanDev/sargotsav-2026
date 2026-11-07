@@ -10,8 +10,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Caveat:wght@700&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+<!-- served from this site, so the desk never waits on a CDN at the venue -->
+<script src="assets/vendor/supabase-js-2.45.4.min.js"></script>
+<script src="assets/vendor/jsqr-1.4.0.min.js" defer></script>
 <style>
 /* Check-in desk: one-handed, phone first. Ink header, paper body, a big camera window,
    and one result card that says clearly: present, already in, or not found. */
@@ -117,8 +118,25 @@ button{cursor:pointer}
 .foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;font-size:.82rem;color:var(--muted);border-top:2px dashed var(--line);padding-top:14px}
 .foot a{color:inherit}
 @keyframes pop{from{transform:scale(.96);opacity:.4}}
-.res{animation:pop .25s ease-out}
+.res.anim{animation:pop .25s ease-out}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+
+/* sync + quick controls */
+.top .brand .net{font-family:var(--display);font-size:.74rem;color:#d9d0c1}
+.net{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:#d9d0c1;white-space:nowrap}
+.net i{width:8px;height:8px;border-radius:50%;background:var(--green);flex:none}
+.net.wait i{background:var(--yellow)}
+.net.off i{background:var(--coral)}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:.9rem;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;cursor:pointer;user-select:none}
+.toggle input{width:20px;height:20px;accent-color:var(--green);margin:0}
+.cam .torch{position:absolute;top:10px;left:10px;background:rgba(20,20,20,.7);color:#fff;border:0;border-radius:10px;padding:6px 10px;font-weight:700;font-size:.85rem}
+.cam .torch[aria-pressed="true"]{background:var(--yellow);color:var(--ink)}
+.has-res .cam{aspect-ratio:4/3;max-height:40vh}
+.sync{font-size:.82rem;font-weight:700;color:var(--muted)}
+.sync.wait{color:#8a5a00}
+.res .facts{font-size:.86rem}
+.banner{border-radius:12px;padding:10px 12px;font-weight:600;font-size:.9rem;background:#fff6dc;border:1.5px solid #f1d58a;color:#6d4a00}
 </style>
 </head>
 <body>
@@ -133,7 +151,7 @@ button{cursor:pointer}
       <div class="field"><label for="pw">Shared password</label><input id="pw" type="password" autocomplete="current-password" required></div>
       <div class="alert err" id="loginErr" role="alert" hidden></div>
       <button class="btn block" type="submit" id="loginBtn">Sign in</button>
-      <p class="fine">Signed in on the admin desk already? This page uses the same sign-in.</p>
+      <p class="fine">Signed in on the admin desk already? This page uses the same sign-in. Sign in before the day starts: after that, scanning keeps working even if the internet drops.</p>
     </div>
   </form>
 </section>
@@ -142,15 +160,17 @@ button{cursor:pointer}
   <header class="top">
     <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
     <div class="bar">
-      <div class="brand"><b>Sargotsav check-in</b><span>14 Nov · QLS Panayappilly</span></div>
+      <div class="brand"><b>Sargotsav check-in</b><span class="net" id="net"><i></i><b id="netText">Loading list…</b></span></div>
       <div class="count" aria-live="polite"><b class="num" id="nIn">0</b><em class="num"> / <i id="nAll">0</i></em><span>present</span></div>
     </div>
   </header>
 
-  <main class="wrapx">
+  <main class="wrapx" id="wrap">
+    <div class="banner" id="banner" hidden></div>
     <div class="cam" id="cam">
-      <video id="video" playsinline muted hidden></video>
+      <video id="video" playsinline muted autoplay hidden></video>
       <div class="frame" id="frame" hidden></div>
+      <button class="torch" type="button" id="torch" aria-pressed="false" hidden>Torch</button>
       <button class="stop" type="button" id="stopCam" hidden>Stop camera</button>
       <div class="hint" id="camHint" hidden>Point at the QR on the pass</div>
       <div class="idle" id="camIdle">
@@ -158,6 +178,10 @@ button{cursor:pointer}
         <button class="btn yellow" type="button" id="startCam">Start scanning</button>
         <p id="camMsg">Uses this phone's back camera. Nothing is recorded.</p>
       </div>
+    </div>
+
+    <div class="tools">
+      <label class="toggle"><input type="checkbox" id="quick"> Mark present as soon as scanned</label>
     </div>
 
     <form class="manual" id="manual" autocomplete="off">
@@ -174,7 +198,7 @@ button{cursor:pointer}
 
     <div class="foot">
       <span id="meEmail"></span>
-      <span><a href="admin.html">Admin desk</a> · <button class="btn sm ghost" type="button" id="signout">Sign out</button></span>
+      <span><a href="admin">Admin desk</a> · <button class="btn sm ghost" type="button" id="signout">Sign out</button></span>
     </div>
   </main>
 </div>
@@ -187,20 +211,34 @@ const CATS=[["kids","Kids","#F57A22"],["children","Children","#308E40"],["subjun
 const CN=Object.fromEntries(CATS.map(c=>[c[0],c[1]])), CC=Object.fromEntries(CATS.map(c=>[c[0],c[2]]));
 const COLORS=["#FFC23A","#9DD1C0","#F57A22","#E2246E","#4581CB","#308E40","#F14F3A","#4F5BA3","#2B7D60"];
 const EV={};for(const k in ITEMS)ITEMS[k].forEach((i,n)=>EV[i.code]={...i,cat:k,color:COLORS[n%COLORS.length]});
+const COLS="id,reg_no,name,dob,gender,phone,category,items,checkin_token,checked_in_at,checked_in_by";
 const $=s=>document.querySelector(s);
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const div=r=>CN[r.category]+((r.category==="junior"||r.category==="teens")?(r.gender==="boy"?" Boys":" Girls"):"");
+const fmtTime=t=>new Date(t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"});
 const fmtT=t=>new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"});
 const fmtD=d=>{const [y,m,dd]=d.split("-");return `${dd}/${m}/${y}`};
 const ageOn=dob=>{const d=new Date(dob+"T00:00:00");let a=2026-d.getFullYear();if(d.getMonth()>5||(d.getMonth()===5&&d.getDate()>1))a--;return a};
+const regKey=c=>"SGV-"+String(parseInt(String(c).replace(/\D/g,""),10)).padStart(4,"0");
 
-let me="", busy=false, current=null, recent=[];
-try{recent=JSON.parse(sessionStorage.getItem("sg_recent")||"[]")}catch(e){}
+/* ---------- state ----------
+   The whole contestant list lives on this phone (refreshed every 20 s), so a scan is answered
+   instantly with no network wait. Marks go into a queue that is saved on the phone and sent in
+   the background, retrying until the server confirms. The server keeps the first check-in, so
+   two admins scanning the same pass can never double count. */
+let me="", roster=new Map(), byToken=new Map(), byReg=new Map();
+let queue=ls.get("sg_ci_queue",[]), recent=ls.get("sg_ci_recent",[]);
+let shown=null, lastSync=0, syncing=false, online=navigator.onLine, refreshTimer=null, flushTimer=null, backoff=2000;
+
+function index(){byToken.clear();byReg.clear();for(const r of roster.values()){if(r.checkin_token)byToken.set(r.checkin_token,r);byReg.set(r.reg_no,r)}}
+function applyQueue(){for(const q of queue){const r=roster.get(q.id);if(!r)continue;
+  if(q.undo){r.checked_in_at=null;r.checked_in_by=null}else if(!r.checked_in_at){r.checked_in_at=q.at;r.checked_in_by=me}r._pending=true}}
+function saveLocal(){ls.set("sg_ci_roster",{me,at:lastSync,rows:[...roster.values()].map(({_pending,...r})=>r)});ls.set("sg_ci_queue",queue)}
+function setRows(rows){const m=new Map();for(const r of rows)m.set(r.id,r);roster=m;applyQueue();index();counts()}
 
 /* ---------- token from a scanned QR ---------- */
-// Pass QRs hold https://<site>/checkin.html?t=<token>, or SARGOTSAV:<token> when the site address was unknown.
 function codeFrom(text){
   const s=String(text||"").trim();
   const m=s.match(/[?&#]t=([A-Za-z0-9_-]{20,64})/)||s.match(/^SARGOTSAV:([A-Za-z0-9_-]{20,64})$/i)||s.match(/^([A-Za-z0-9_-]{20,64})$/);
@@ -209,19 +247,28 @@ function codeFrom(text){
   return null;
 }
 
-/* ---------- auth (same flow and session as admin.html) ---------- */
+/* ---------- auth (same flow and session as admin) ---------- */
 async function boot(){
   const {data:{session}}=await sb.auth.getSession();
-  if(!session){$("#gate").hidden=false;$("#app").hidden=true;$("#em").value=store.get("sg_admin_email")||"";($("#em").value?$("#pw"):$("#em")).focus();return}
+  if(!session){showGate();return}
   me=(session.user.email||"").toLowerCase();
-  const {data,error}=await sb.from("admins").select("email").eq("email",me);
-  if(error||!data||!data.length){await sb.auth.signOut();$("#gate").hidden=false;$("#app").hidden=true;
-    const e=$("#loginErr");e.textContent="This email isn't on the admin list.";e.hidden=false;return}
+  const cached=ls.get("sg_ci_roster",null);
+  if(cached&&cached.me===me){lastSync=cached.at||0;setRows(cached.rows||[])}
+  // offline with a saved list: keep working. Online: confirm this email is still an admin.
+  if(navigator.onLine){
+    const {data,error}=await sb.from("admins").select("email").eq("email",me);
+    if(!error&&(!data||!data.length)){await signOutClean();showGate("This email isn't on the admin list.");return}
+  }
   $("#gate").hidden=true;$("#app").hidden=false;$("#meEmail").textContent=me;
-  renderRecent();counts();setInterval(counts,30000);
+  renderRecent();renderNet();
+  await refresh();flush();
+  clearInterval(refreshTimer);refreshTimer=setInterval(()=>{if(!document.hidden)refresh()},20000);
   const t=new URLSearchParams(location.search).get("t");
-  if(t){history.replaceState(null,"",location.pathname);lookup(t)}
+  if(t){history.replaceState(null,"",location.pathname);const c=codeFrom(t);if(c)lookup(c,false)}
 }
+function showGate(msg){$("#gate").hidden=false;$("#app").hidden=true;$("#em").value=localStorage.getItem("sg_admin_email")||"";
+  const e=$("#loginErr");e.hidden=!msg;if(msg)e.textContent=msg;($("#em").value?$("#pw"):$("#em")).focus()}
+async function signOutClean(){stopCam();ls.del("sg_ci_roster");ls.del("sg_ci_recent");roster=new Map();index();await sb.auth.signOut()}
 $("#loginForm").addEventListener("submit",async e=>{
   e.preventDefault();const err=$("#loginErr");err.hidden=true;
   const email=$("#em").value.trim().toLowerCase(),password=$("#pw").value;
@@ -234,130 +281,191 @@ $("#loginForm").addEventListener("submit",async e=>{
       r.status===401?"That email isn't an admin, or the password is wrong.":"Sign-in failed. Try again in a minute.";err.hidden=false;return}
     const {error}=await sb.auth.verifyOtp({token_hash:j.token_hash,type:"magiclink"});
     if(error){err.textContent="Sign-in failed: "+error.message;err.hidden=false;return}
-    store.set("sg_admin_email",email);$("#pw").value="";await boot();
+    try{localStorage.setItem("sg_admin_email",email)}catch(x){}
+    $("#pw").value="";await boot();
   }catch(x){err.textContent="Couldn't reach the server. Check your internet connection.";err.hidden=false}
   finally{b.disabled=false;b.textContent="Sign in"}
 });
-$("#signout").onclick=async()=>{stopCam();await sb.auth.signOut();location.reload()};
+$("#signout").onclick=async()=>{
+  if(queue.length&&!confirm(`${queue.length} check-in(s) haven't reached the server yet. Signing out now would lose them. Sign out anyway?`))return;
+  queue=[];ls.set("sg_ci_queue",[]);await signOutClean();location.reload()};
 
-async function counts(){
-  const [a,b]=await Promise.all([
-    sb.from("registrations").select("id",{count:"exact",head:true}),
-    sb.from("registrations").select("id",{count:"exact",head:true}).not("checked_in_at","is",null)]);
-  if(!a.error)$("#nAll").textContent=a.count??0;
-  if(!b.error)$("#nIn").textContent=b.count??0;
+/* ---------- sync ---------- */
+async function refresh(){
+  if(syncing)return;syncing=true;renderNet();
+  try{
+    const {data,error}=await sb.from("registrations").select(COLS).order("reg_no").range(0,9999);
+    if(error)throw error;
+    lastSync=Date.now();online=true;setRows(data||[]);saveLocal();
+    if(shown){const r=roster.get(shown.id);if(r){shown=r;showPerson(r,shown._state==="ok"?"ok":null)}}
+  }catch(e){online=false;if(/JWT|auth|401/i.test(String(e.message||e)))banner("Your sign-in has expired. Scans still work from the saved list; sign in again when you can.")}
+  finally{syncing=false;renderNet()}
 }
+async function flush(){
+  clearTimeout(flushTimer);
+  while(queue.length){
+    const q=queue[0];
+    try{
+      const {data,error}=await sb.rpc("checkin_mark",{p_id:q.id,p_undo:!!q.undo});
+      if(error){
+        const m=String(error.message||"");
+        if(m.includes("not_found")){queue.shift();roster.delete(q.id);index();saveLocal();continue}
+        if(m.includes("not_admin")){banner("This email was removed from the admin list. Check-ins on this phone can't be saved.");break}
+        throw error;
+      }
+      queue.shift();online=true;backoff=2000;
+      const r=roster.get(q.id);
+      if(r){r.checked_in_at=data.checked_in_at;r.checked_in_by=data.checked_in_by;r._pending=queue.some(x=>x.id===q.id);
+        if(data.already&&!q.undo){const mine=recent.find(x=>x.id===q.id);if(mine){mine.t=data.checked_in_at;mine.by=data.checked_in_by}}}
+      saveLocal();counts();renderRecent();
+      if(shown&&shown.id===q.id)showPerson(roster.get(q.id),shown._state);
+    }catch(e){online=false;renderNet();flushTimer=setTimeout(flush,backoff);backoff=Math.min(backoff*2,30000);return}
+  }
+  renderNet();
+}
+addEventListener("online",()=>{online=true;backoff=2000;flush();refresh()});
+addEventListener("offline",()=>{online=false;renderNet()});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){flush();if(Date.now()-lastSync>10000)refresh()}});
+function renderNet(){
+  const n=$("#net"),t=$("#netText");if(!n)return;
+  if(queue.length){n.className="net wait";t.textContent=online?`Saving ${queue.length}…`:`Offline · ${queue.length} to save`}
+  else if(!online){n.className="net off";t.textContent=roster.size?"Offline · using saved list":"Offline"}
+  else{n.className="net";t.textContent=syncing&&!lastSync?"Loading list…":lastSync?`Synced ${fmtTime(lastSync)}`:"Online"}
+}
+function counts(){let a=0,b=0;for(const r of roster.values()){a++;if(r.checked_in_at)b++}$("#nAll").textContent=a;$("#nIn").textContent=b}
+function banner(m){const b=$("#banner");b.textContent=m;b.hidden=!m}
 
 /* ---------- look up + mark ---------- */
-async function lookup(code){
-  if(busy)return;busy=true;
-  $("#result").innerHTML=`<div class="res new"><div class="band"><i>…</i>Looking up</div></div>`;
-  try{
-    const {data,error}=await sb.rpc("checkin_lookup",{p_code:code});
-    if(error)throw error;
-    current=data;
-    if(!data){showNotFound(code);buzz([80,60,80]);return}
-    showPerson(data);buzz(60);
-  }catch(e){
-    current=null;const m=String(e.message||e);
-    $("#result").innerHTML=`<div class="res nf"><div class="band"><i>!</i>${m.includes("not_admin")?"You're not on the admin list":"Couldn't reach the server"}</div><div class="body"><p class="fine">${m.includes("not_admin")?"Sign out and sign in with an admin email.":"Check the internet connection and scan again."}</p></div></div>`;
-  }finally{busy=false}
+async function lookup(code,fromCam){
+  let r=/^(SGV-?)?\d{1,5}$/i.test(code)?byReg.get(regKey(code)):byToken.get(code);
+  if(!r&&navigator.onLine){ // registered after the last refresh: ask the server once
+    showBand("new","…","Looking up");
+    try{const {data,error}=await sb.rpc("checkin_lookup",{p_code:code});if(error)throw error;
+      if(data){await refresh();r=roster.get(data.id)||data}}catch(e){}
+  }
+  if(!r){showNotFound(code);buzz([80,60,80]);return}
+  buzz(50);
+  if(!r.checked_in_at&&$("#quick").checked){mark(r,false);return}
+  showPerson(r,null);
 }
+function mark(r,undo){
+  if(!undo&&r.checked_in_at){showPerson(r,"dup");return} // already in: nothing to send
+  const at=new Date().toISOString();
+  queue=queue.filter(q=>q.id!==r.id);queue.push({id:r.id,undo,at}); // the latest action for a person wins
+  const state="ok";
+  if(undo){r.checked_in_at=null;r.checked_in_by=null;recent=recent.filter(x=>x.id!==r.id)}
+  else{r.checked_in_at=at;r.checked_in_by=me;recent=[{id:r.id,n:r.name,r:r.reg_no,t:at},...recent.filter(x=>x.id!==r.id)].slice(0,40);buzz([40,40,120])}
+  r._pending=queue.some(q=>q.id===r.id);
+  ls.set("sg_ci_recent",recent);saveLocal();counts();renderRecent();renderNet();
+  showPerson(r,undo?null:state);
+  flush();
+  if(!undo&&state==="ok"&&stream)setTimeout(()=>{if(shown&&shown.id===r.id)resumeScan()},900);
+}
+function showBand(cls,icon,text){document.body.classList.add("has-res");$("#result").innerHTML=`<div class="res ${cls}"><div class="band"><i>${icon}</i>${esc(text)}</div></div>`}
 function showNotFound(code){
-  $("#result").innerHTML=`<div class="res nf"><div class="band"><i>✕</i>No pass found</div><div class="body">
-    <p style="margin:0">${/^(SGV-?)?\d{1,5}$/i.test(code)?`There's no registration ${esc(code.toUpperCase())}.`:"This QR isn't a Sargotsav pass, or the registration was deleted."}</p>
-    <p class="fine">Ask for their reg. no. and type it below, or call 92499 99743.</p>
+  shown=null;document.body.classList.add("has-res");
+  const typed=/^(SGV-?)?\d{1,5}$/i.test(code);
+  $("#result").innerHTML=`<div class="res nf anim"><div class="band"><i>✕</i>No pass found</div><div class="body">
+    <p style="margin:0">${typed?`There's no registration ${esc(regKey(code))}.`:"This QR isn't a Sargotsav pass, or the registration was deleted."}</p>
+    <p class="fine">${navigator.onLine?"Ask for their reg. no. and type it above, or call 92499 99743.":"This phone is offline, so only contestants on the saved list can be found. Try again when the internet is back."}</p>
     <button class="btn ghost block" type="button" data-next>Scan next</button></div></div>`;
-  wireNext();
+  wireNext();resumeLater();
 }
-function showPerson(r){
-  const state=r.checked_in_at?(r._just?"ok":"dup"):"new";
+function showPerson(r,state){
+  const fresh=!shown||shown.id!==r.id;
+  shown=r;document.body.classList.add("has-res");
+  state=state||(r.checked_in_at?"dup":"new");shown._state=state;
   const band=state==="ok"?`<i>✓</i>Present · checked in`:state==="dup"?`<i>!</i>Already checked in`:`<i>?</i>Confirm attendance`;
   const evs=(r.items||[]).map(c=>{const e=EV[c];return `<li style="--c:${e?e.color:"#999"}">${esc(e?e.en:c)}</li>`}).join("");
-  $("#result").innerHTML=`<div class="res ${state}"><div class="band">${band}</div><div class="body">
+  const sync=r._pending?`<span class="sync wait">${online?"Saving…":"Saved on this phone · will sync when online"}</span>`:(r.checked_in_at?`<span class="sync">✓ Saved</span>`:"");
+  $("#result").innerHTML=`<div class="res ${state}${fresh?" anim":""}"><div class="band">${band}</div><div class="body">
     <div class="nm">${esc(r.name)}</div>
-    <div class="meta"><span class="reg num">${esc(r.reg_no)}</span><span class="pill" style="--c:${CC[r.category]}">${esc(div(r))}</span></div>
+    <div class="meta"><span class="reg num">${esc(r.reg_no)}</span><span class="pill" style="--c:${CC[r.category]}">${esc(div(r))}</span>${sync}</div>
     <ul class="evs">${evs}</ul>
     <dl class="facts"><dt>Age</dt><dd>${ageOn(r.dob)} · born ${fmtD(r.dob)}</dd><dt>Phone</dt><dd><a href="tel:+91${esc(r.phone)}">${esc(r.phone)}</a></dd>
-      ${r.checked_in_at?`<dt>Checked in</dt><dd class="when">${fmtT(r.checked_in_at)}${r.checked_in_by?` · ${esc(r.checked_in_by.split("@")[0])}`:""}</dd>`:""}
-      ${!r.by_token?`<dt>Found by</dt><dd>typed reg. no. Check the name with the pass.</dd>`:""}</dl>
+      ${r.checked_in_at?`<dt>Checked in</dt><dd class="when">${fmtT(r.checked_in_at)}${r.checked_in_by?` · ${esc(r.checked_in_by.split("@")[0])}`:""}</dd>`:""}</dl>
     <div class="acts">${state==="new"
       ?`<button class="btn go block" type="button" id="markBtn">✓ Mark present</button><button class="btn ghost block" type="button" data-next>Cancel</button>`
       :`<button class="btn block" type="button" data-next>Scan next</button><button class="btn sm ghost" type="button" id="undoBtn">Undo check-in</button>`}</div>
   </div></div>`;
-  const mb=$("#markBtn");if(mb)mb.onclick=()=>mark(false);
-  const ub=$("#undoBtn");if(ub)ub.onclick=()=>{if(confirm(`Undo the check-in for ${r.name}?`))mark(true)};
+  const mb=$("#markBtn");if(mb){mb.onclick=()=>mark(r,false);mb.focus({preventScroll:true})}
+  const ub=$("#undoBtn");if(ub)ub.onclick=()=>{if(confirm(`Undo the check-in for ${r.name}?`))mark(r,true)};
   wireNext();
-  if(state==="new")mb.focus();
+  if(state==="dup")resumeLater();
 }
-async function mark(undo){
-  if(!current||busy)return;busy=true;
-  const btn=$("#markBtn")||$("#undoBtn");if(btn){btn.disabled=true;btn.textContent=undo?"Undoing…":"Saving…"}
-  try{
-    const {data,error}=await sb.rpc("checkin_mark",{p_id:current.id,p_undo:undo});
-    if(error)throw error;
-    current={...current,checked_in_at:data.checked_in_at,checked_in_by:data.checked_in_by,_just:!undo&&!data.already};
-    if(undo){recent=recent.filter(x=>x.id!==current.id)}
-    else if(!data.already){recent=[{id:current.id,n:current.name,r:current.reg_no,t:data.checked_in_at},...recent.filter(x=>x.id!==current.id)].slice(0,30);buzz([40,40,120])}
-    try{sessionStorage.setItem("sg_recent",JSON.stringify(recent))}catch(e){}
-    renderRecent();counts();
-    busy=false;
-    if(undo){current={...current,checked_in_at:null,checked_in_by:null};showPerson(current)}else showPerson(current);
-  }catch(e){busy=false;if(btn){btn.disabled=false;btn.textContent=undo?"Undo check-in":"✓ Mark present"}alert("Couldn't save: "+(e.message||e))}
-}
-function wireNext(){document.querySelectorAll("[data-next]").forEach(b=>b.onclick=()=>{$("#result").innerHTML="";current=null;$("#code").value="";if(stream)resumeScan();else window.scrollTo({top:0,behavior:"smooth"})})}
+function wireNext(){document.querySelectorAll("[data-next]").forEach(b=>b.onclick=clearResult)}
+function clearResult(){shown=null;$("#result").innerHTML="";document.body.classList.remove("has-res");$("#code").value="";if(stream)resumeScan()}
+function resumeLater(){if(stream)setTimeout(()=>{if(stream&&!scanning)resumeScan(true)},1200)}
 function renderRecent(){
   $("#recentBox").hidden=!recent.length;
-  $("#recent").innerHTML=recent.map(x=>`<li><b>${esc(x.n)}</b><span class="num">${esc(x.r)}</span><span>${new Date(x.t).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit",timeZone:"Asia/Kolkata"})}</span></li>`).join("");
+  $("#recent").innerHTML=recent.map(x=>`<li><b>${esc(x.n)}</b><span class="num">${esc(x.r)}</span><span>${fmtTime(x.t)}</span></li>`).join("");
 }
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+const quickBox=$("#quick");quickBox.checked=ls.get("sg_ci_quick",false);quickBox.onchange=()=>ls.set("sg_ci_quick",quickBox.checked);
 
 $("#manual").addEventListener("submit",e=>{e.preventDefault();const v=$("#code").value.trim();if(!v)return;
-  const c=codeFrom(v);if(!c){showNotFound(v);return}$("#code").blur();lookup(c)});
+  const c=codeFrom(v);if(!c){showNotFound(v);return}$("#code").blur();lookup(c,false)});
 
 /* ---------- camera ---------- */
-let stream=null, detector=null, scanning=false, lastText="", lastAt=0;
+// Android Chrome has a built-in QR reader (BarcodeDetector): fast and light. iPhones use jsQR on a
+// small centre crop of each frame. The camera stays on between scans; the same pass is ignored for 5 s.
+let stream=null, track=null, detector=null, scanning=false, lastText="", lastAt=0, wakeLock=null, torchOn=false;
 const video=$("#video"), cv=document.createElement("canvas"), cx=cv.getContext("2d",{willReadFrequently:true});
 async function startCam(){
   const msg=$("#camMsg");
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg.textContent="This browser can't open the camera. Use Chrome or Safari, or type the reg. no. below.";return}
+  if(!window.isSecureContext||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){msg.textContent="This browser can't open the camera here. Open the check-in page in Chrome or Safari, or type the reg. no. below.";return}
+  $("#startCam").disabled=true;$("#startCam").textContent="Opening camera…";
   try{
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"},width:{ideal:1280},height:{ideal:720}},audio:false});
-  }catch(e){msg.textContent=e.name==="NotAllowedError"?"Camera permission was refused. Allow the camera for this site in the browser settings, then try again.":"Couldn't open the camera: "+e.message;return}
+  }catch(e){
+    $("#startCam").disabled=false;$("#startCam").textContent="Start scanning";
+    msg.textContent=e.name==="NotAllowedError"?"Camera permission was refused. Tap the camera or lock icon in the address bar, allow the camera, then tap Start scanning again.":
+      e.name==="NotReadableError"?"Another app is using the camera. Close it and try again.":"Couldn't open the camera: "+e.message;return}
+  track=stream.getVideoTracks()[0];
+  try{const c=track.getCapabilities?track.getCapabilities():{};
+    if(c.focusMode&&c.focusMode.includes("continuous"))await track.applyConstraints({advanced:[{focusMode:"continuous"}]});
+    $("#torch").hidden=!c.torch}catch(e){}
   video.srcObject=stream;await video.play().catch(()=>{});
-  if("BarcodeDetector" in window){try{const f=await BarcodeDetector.getSupportedFormats();if(f.includes("qr_code"))detector=new BarcodeDetector({formats:["qr_code"]})}catch(e){}}
+  if(!detector&&"BarcodeDetector" in window){try{const f=await BarcodeDetector.getSupportedFormats();if(f.includes("qr_code"))detector=new BarcodeDetector({formats:["qr_code"]})}catch(e){}}
   video.hidden=false;$("#frame").hidden=false;$("#camHint").hidden=false;$("#stopCam").hidden=false;$("#camIdle").hidden=true;
-  resumeScan();
+  $("#startCam").disabled=false;$("#startCam").textContent="Start scanning";
+  keepAwake();resumeScan();
 }
 function stopCam(){
-  scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
-  video.hidden=true;$("#frame").hidden=true;$("#camHint").hidden=true;$("#stopCam").hidden=true;$("#camIdle").hidden=false;
+  scanning=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;track=null}
+  torchOn=false;$("#torch").setAttribute("aria-pressed","false");
+  video.hidden=true;$("#frame").hidden=true;$("#camHint").hidden=true;$("#stopCam").hidden=true;$("#torch").hidden=true;$("#camIdle").hidden=false;
+  if(wakeLock){wakeLock.release().catch(()=>{});wakeLock=null}
 }
-function resumeScan(){if(!stream)return;scanning=true;$("#camHint").textContent="Point at the QR on the pass";window.scrollTo({top:0,behavior:"smooth"});requestAnimationFrame(tick)}
+async function keepAwake(){try{if("wakeLock" in navigator&&!document.hidden)wakeLock=await navigator.wakeLock.request("screen")}catch(e){}}
+function resumeScan(keepCard){if(!stream)return;scanning=true;$("#camHint").textContent="Point at the QR on the pass";if(!keepCard)window.scrollTo({top:0,behavior:"smooth"});requestAnimationFrame(tick)}
+let busyFrame=false;
 async function tick(){
   if(!scanning||!stream)return;
-  if(video.readyState>=2&&!busy){
-    let text=null;
+  if(video.readyState>=2&&!busyFrame){
+    busyFrame=true;let text=null;
     try{
       if(detector){const r=await detector.detect(video);if(r.length)text=r[0].rawValue}
-      else if(window.jsQR){const w=video.videoWidth,h=video.videoHeight,s=Math.min(w,h),sz=Math.min(640,s);
+      else if(window.jsQR){const w=video.videoWidth,h=video.videoHeight,s=Math.min(w,h)*.8,sz=Math.min(420,Math.round(s));
         cv.width=sz;cv.height=sz;cx.drawImage(video,(w-s)/2,(h-s)/2,s,s,0,0,sz,sz);
-        const img=cx.getImageData(0,0,sz,sz);const r=jsQR(img.data,sz,sz,{inversionAttempts:"attemptBoth"});if(r)text=r.data}
+        const r=jsQR(cx.getImageData(0,0,sz,sz).data,sz,sz,{inversionAttempts:"dontInvert"});if(r)text=r.data}
     }catch(e){}
-    if(text&&!(text===lastText&&Date.now()-lastAt<4000)){
-      lastText=text;lastAt=Date.now();const c=codeFrom(text);
-      scanning=false;$("#camHint").textContent="Got it";
-      if(c)await lookup(c);else{showNotFound(text);buzz([80,60,80])}
-      $("#result").scrollIntoView({behavior:"smooth",block:"start"});
+    busyFrame=false;
+    if(text&&!(text===lastText&&Date.now()-lastAt<5000)){
+      lastText=text;lastAt=Date.now();scanning=false;$("#camHint").textContent="Got it";
+      const c=codeFrom(text);
+      if(c)await lookup(c,true);else{showNotFound(text);buzz([80,60,80])}
       return;
     }
   }
-  setTimeout(()=>requestAnimationFrame(tick),detector?120:180);
+  setTimeout(()=>requestAnimationFrame(tick),detector?90:140);
 }
 $("#startCam").onclick=startCam;
 $("#stopCam").onclick=stopCam;
+$("#torch").onclick=async()=>{if(!track)return;torchOn=!torchOn;try{await track.applyConstraints({advanced:[{torch:torchOn}]})}catch(e){torchOn=false}$("#torch").setAttribute("aria-pressed",String(torchOn))};
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&stream)stopCam()});
 
+if("serviceWorker" in navigator&&location.protocol==="https:")navigator.serviceWorker.register("sw.js").catch(()=>{});
 boot();
 </script>
 </body>

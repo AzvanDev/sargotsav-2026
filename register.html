@@ -590,7 +590,7 @@ $("#another").onclick=()=>{
 
 /* ---------- check-in QR + emailed pass ---------- */
 // The QR holds only the secret pass token, inside a link to the organisers' check-in page.
-function qrText(token){return /^https?:$/.test(location.protocol)?new URL("checkin.html?t="+token,location.href).href:"SARGOTSAV:"+token}
+function qrText(token){return /^https?:$/.test(location.protocol)?new URL("checkin?t="+token,location.href).href:"SARGOTSAV:"+token}
 function makeQr(token){if(!token||typeof qrcode!=="function")return null;const q=qrcode(0,"M");q.addData(qrText(token));q.make();return q}
 function renderQr(token){
   const box=$("#fQr");const q=makeQr(token);
