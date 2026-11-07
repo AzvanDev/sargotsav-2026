@@ -17,7 +17,8 @@ const eElastic=x=>x<=0?0:x>=1?1:Math.pow(2,-10*x)*Math.sin((x*10-.75)*(2*Math.PI
 function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 const hex=h=>[parseInt(h.slice(1,3),16)/255,parseInt(h.slice(3,5),16)/255,parseInt(h.slice(5,7),16)/255];
 const rgbStr=(c,a=1)=>`rgba(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)},${a})`;
-let W=innerWidth,H=innerHeight,PHONE=W<760;
+let W=innerWidth,H=innerHeight,PHONE=W<760&&!(W>H&&H<=520);
+const isLand=()=>W>H&&H<=520&&W>=560;
 const DPR=Math.min(window.devicePixelRatio||1,2);
 
 /* =====================================================================
@@ -110,7 +111,7 @@ function makeDrop(r,s,spray){
     dir:[Math.cos(a),Math.sin(a)],tail:sz*(spray?r()*2.5:1.2+r()*4.5),tm:spray?.7:.85,grow:spray?.08:.1,life:spray?.1:.14,mix:1,useClr:true};
 }
 function buildSplats(){
-  W=innerWidth;H=innerHeight;PHONE=W<760;
+  W=innerWidth;H=innerHeight;PHONE=W<760&&!(W>H&&H<=520);
   const M=Math.max(W,H), land=W>H, r=rng(20261114), S=land?M:H*.62;
   const heroP=land?[[.30,.40,.30,'orange'],[.74,.30,.30,'blue'],[.50,.80,.28,'magenta'],[.12,.72,.27,'green'],[.90,.78,.27,'coral']]
                   :[[.52,.40,.40,'orange'],[.18,.14,.36,'magenta'],[.84,.20,.36,'blue'],[.18,.80,.36,'green'],[.82,.86,.36,'coral']];
@@ -582,7 +583,7 @@ const mk=document.createElement('canvas'),mx=mk.getContext('2d');const MS=.5;
 function sizeMask(){mk.width=Math.max(2,Math.round(W*MS));mk.height=Math.max(2,Math.round(H*MS));mx.setTransform(MS,0,0,MS,0,0);mx.clearRect(0,0,W,H);maskDirty=true}
 let zone,logoR,passes=[],bw=120;
 function relayout(keepState){
-  W=innerWidth;H=innerHeight;PHONE=W<760;
+  W=innerWidth;H=innerHeight;PHONE=W<760&&!(W>H&&H<=520);
   const lr=$('#logoWrap').getBoundingClientRect();logoR={x:lr.left,y:lr.top,w:lr.width,h:lr.height,k:lr.width/SCRIPT.W};
   const hr=$('#hero').getBoundingClientRect();
   layoutDoodles();
@@ -590,6 +591,7 @@ function relayout(keepState){
   const padX=PHONE?16:34,padY=PHONE?26:44,mX=PHONE?12:20;
   zone={x0:PHONE?-14:Math.max(mX,Math.min(hr.left,db.x0)-padX),x1:PHONE?W+14:Math.min(W-mX,Math.max(hr.right,db.x1)+padX),
         y0:Math.max(PHONE?66:70,Math.min(hr.top,db.y0)-padY),y1:Math.min(H-(PHONE?12:18),Math.max(hr.bottom,db.y1)+padY)};
+  window.__fitInfo=fitDoodles();
   buildBrushPath();
   sizeLogoCanvas();pillIndicator();
   if(keepState){sizeMask();if(clock>TL.brushStart)paintMaskTo(clock,true)}
@@ -1081,6 +1083,7 @@ function buildDoodles(){
 }
 function layoutDoodles(){
   const lr=$('#logoWrap').getBoundingClientRect();
+  if(isLand())return layoutLand(lr);
   const pos=PHONE?DPOS_PHONE:DPOS_DESK;
   const anchor={};
   for(const id of ['kicker']){const el=$('#'+id),tf=el.style.transform;el.style.transform='none';const r=el.getBoundingClientRect();anchor[id]=r.top+r.height/2;el.style.transform=tf}
@@ -1096,6 +1099,47 @@ function layoutDoodles(){
     e.sw=sw;
     e.order=k++;
   }
+}
+// landscape phone: one column either side of the hero
+function layoutLand(lr){
+  const hr=$('#hero').getBoundingClientRect(),gapL=hr.left,gapR=W-hr.right;
+  const ids={L:['speech','song','quran'],R:['photo','reel','quiz']};let k=0;
+  for(const id in dEls){const e=dEls[id];e.on=false;e.g.style.display='none'}
+  for(const side of ['L','R']){const gap=side==='L'?gapL:gapR,size=Math.min(lr.height*.3,gap*.62,(H-90)/3.6);
+    if(size<30)continue;
+    ids[side].forEach((id,i)=>{const e=dEls[id];e.on=true;e.g.style.display='';e.size=size;
+      const cx=side==='L'?gap*.5+(i%2?-1:1)*size*.12:W-gap*.5+(i%2?1:-1)*size*.12;
+      const cy=hr.top+hr.height*(i+.5)/3;e.x=cx-size/2;e.y=cy-size/2;e.sw=8*Math.min(1,62/size)**.35;e.order=k++})}
+}
+const ov=(e,r)=>{const m=e.size*.1;return e.x+m<r.x1&&e.x+e.size-m>r.x0&&e.y+m<r.y1&&e.y+e.size-m>r.y0};
+function plainRect(el){const tf=el.style.transform;el.style.transform='none';const r=el.getBoundingClientRect();el.style.transform=tf;return r}
+function heroRects(){ // what doodles must not cover: the logo and the actual text/chips/button, without their intro offsets
+  const out=[],add=(r,p)=>{if(r.width>0)out.push({x0:r.left-p,y0:r.top-p,x1:r.right+p,y1:r.bottom+p})};
+  add(plainRect($('#logoWrap')),4);
+  const k=$('#kicker'),tf=k.style.transform;k.style.transform='none';const rg=document.createRange();rg.selectNodeContents(k);add(rg.getBoundingClientRect(),6);k.style.transform=tf;
+  for(const id of ['meta','cta']){const el=$('#'+id),tf2=el.style.transform;el.style.transform='none';for(const c of el.children)add(c.getBoundingClientRect(),6);el.style.transform=tf2}
+  return out;
+}
+function headerBottom(){let b=0;for(const id of ['badge','lang','snd']){const r=plainRect($('#'+id));b=Math.max(b,r.bottom)}return b}
+// squeeze every doodle into the brushed (white) area, off the logo and text
+function fitDoodles(){
+  const ins=PHONE?14:22,hb=headerBottom();
+  const S={x0:Math.max(zone.x0+ins,8),x1:Math.min(zone.x1-ins,W-8),y0:Math.max(zone.y0+ins+4,hb+8),y1:Math.min(zone.y1-ins-4,H-8)};
+  const R=heroRects(),on=Object.values(dEls).filter(e=>e.on);
+  if(!PHONE){for(const left of [true,false]){ // side columns: compress to the height available
+    const col=on.filter(e=>(e.x+e.size/2<W/2)===left);if(!col.length)continue;
+    const top=Math.min(...col.map(e=>e.y)),bot=Math.max(...col.map(e=>e.y+e.size)),span=bot-top,avail=S.y1-S.y0;
+    if(span>avail){const f=avail/span;for(const e of col){const cx=e.x+e.size/2,cy=S.y0+(e.y+e.size/2-top)*f;e.size*=f;e.x=cx-e.size/2;e.y=cy-e.size/2}}
+    else{const dy=top<S.y0?S.y0-top:bot>S.y1?S.y1-bot:0;for(const e of col)e.y+=dy}}}
+  for(const e of on){
+    e.size=Math.min(e.size,S.x1-S.x0,S.y1-S.y0);
+    e.x=clamp(e.x,S.x0,S.x1-e.size);e.y=clamp(e.y,S.y0,S.y1-e.size);
+    for(let i=0;i<8&&R.some(r=>ov(e,r));i++){const cx=e.x+e.size/2,cy=e.y+e.size/2;e.size*=.88;e.x=cx-e.size/2;e.y=cy-e.size/2}
+    if(e.size<(PHONE?30:34)||R.some(r=>ov(e,r))){e.on=false;e.g.style.display='none';continue}
+    e.sw=(PHONE?8.6:8)*Math.min(1,62/e.size)**.35;
+  }
+  let k=0;for(const id in dEls)if(dEls[id].on)dEls[id].order=k++;
+  return{S,shown:on.filter(e=>e.on).length,hidden:on.filter(e=>!e.on).map(e=>e.d.id)};
 }
 function doodleBounds(){
   let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
@@ -1347,7 +1391,7 @@ function skipTo(target){
   if(FL)finishPaint(target);
   shake=[];balloons=balloons.filter(b=>b.s.tap&&b.T1>target);shreds=[];
 }
-$('#skip').onclick=()=>{skipTo(Math.max(clock,TL.logoDone+.2));try{localStorage.setItem('sg-seen','1')}catch(e){}};
+$('#skip').onclick=()=>{skipTo(Math.max(clock,TL.logoDone+.2))};
 // tap the wall after the intro: a fresh splat
 cv.addEventListener('pointerdown',e=>{
   hideTip();askTilt();
@@ -1381,7 +1425,7 @@ function askTilt(){
   if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission==='function'){DeviceOrientationEvent.requestPermission().then(s=>{if(s==='granted')on()}).catch(()=>{})}else on();
 }
 // Register goes to the Artist Pass form, in the language picked here
-const REGISTER_URL='register.html';
+const REGISTER_URL=location.protocol==='file:'?'register.html':'/register';
 function regHref(){return REGISTER_URL+'?lang='+LANG}
 function openSheet(){hideTip();
   if(REGISTER_URL){document.body.style.transition='opacity .22s';document.body.style.opacity='0';setTimeout(()=>{location.href=regHref()},200);return}
@@ -1391,7 +1435,7 @@ $('#sheetClose').onclick=()=>$('#sheet').classList.remove('open');
 addEventListener('pageshow',e=>{if(e.persisted)document.body.style.opacity='1'}); // back button from the form
 document.addEventListener('visibilitychange',()=>{if(document.hidden){running=false}else if(!running){running=true;start=performance.now()-clock*1000;requestAnimationFrame(loop)}});
 let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{
-  const oldW=W,oldH=H;W=innerWidth;H=innerHeight;PHONE=W<760;
+  const oldW=W,oldH=H;W=innerWidth;H=innerHeight;PHONE=W<760&&!(W>H&&H<=520);
   if(Math.abs(oldW-W)<2&&Math.abs(oldH-H)<120){relayout(true);return} // mobile URL bar
   sizeFx();if(FL){glSize();buildSplats();brushPrev=null;lastSim=0}
   relayout(false);scheduleWriting();sizeMask();
@@ -1412,14 +1456,10 @@ async function boot(){
   await Promise.race([document.fonts?document.fonts.ready:Promise.resolve(),new Promise(r=>setTimeout(r,1500))]);
   relayout(false);sizeMask();
   await logoInit();await penInit();
-  let seen=false;try{seen=localStorage.getItem('sg-seen')==='1'}catch(e){}
-  if(QS.has('first'))seen=false;
   if(CAPTURE){window.__dbg={penState,TL,R:()=>logoR,WS:()=>WS,relayout,applyLang};window.__frame=t=>frame(t);window.__ready=true;window.__TL=TL;return}
+  window.__fit=()=>window.__fitInfo;
   if(REDUCED){skipTo(TL.logoDone+.3)}
-  else if(seen){ // returning visitor: paint already there, quicker write-on
-    SPEED=1.6;TL.penIn=.25;brushHidden=true;scheduleWriting();skipTo(.01);
-  } else start=performance.now();
-  try{localStorage.setItem('sg-seen','1')}catch(e){}
+  else start=performance.now(); // every visit and every reload gets the full paint + brush intro
   requestAnimationFrame(loop);
 }
 boot();

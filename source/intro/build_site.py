@@ -20,6 +20,7 @@ j=re.search(r'<script>\n(.*?)</script>\n',s,re.S);s=s.replace(j.group(0),'<scrip
 open(os.path.join(A,'intro.js'),'w',encoding='utf-8').write(j.group(1))
 # 4. images
 shutil.copy(os.path.join(SRC,'cier.webp'),os.path.join(A,'cier.webp'));s=s.replace('__CIER__','assets/intro/cier.webp')
+shutil.copy(os.path.join(SRC,'msm.webp'),os.path.join(A,'msm.webp'));s=s.replace('__MSM__','assets/intro/msm.webp')
 lg=Image.open(os.path.join(SRC,'logo.webp')).convert('RGBA')
 fav=Image.new('RGBA',(512,512),(244,239,230,255));t=lg.copy();t.thumbnail((440,440));fav.paste(t,((512-t.width)//2,(512-t.height)//2),t)
 fav.resize((192,192),Image.LANCZOS).save(os.path.join(A,'icon-192.png'));fav.resize((48,48),Image.LANCZOS).save(os.path.join(A,'favicon.png'))
