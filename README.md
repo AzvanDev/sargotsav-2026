@@ -1,7 +1,7 @@
 # Sargotsav 2026 · MSM Kochi Branch
 
 Website for Sargotsav 2026, the arts festival of MSM Kochi Branch with CIER.
-Saturday 14 November 2026, QLS Panayappilly. Entries close 10 November.
+Saturday 14 November 2026, QLS Panayappilly. Entries close 14 November.
 
 ## Pages
 

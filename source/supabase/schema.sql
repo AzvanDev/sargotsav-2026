@@ -80,7 +80,7 @@ declare
   v_items text[];
   v_row public.registrations;
 begin
-  if now() > timestamptz '2026-11-10 23:59:59+05:30' then
+  if now() > timestamptz '2026-11-14 23:59:59+05:30' then
     raise exception 'closed' using errcode = 'P0001';
   end if;
   if v_cat is null or p_dob > current_date then

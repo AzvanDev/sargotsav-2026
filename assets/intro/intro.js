@@ -25,9 +25,9 @@ const DPR=Math.min(window.devicePixelRatio||1,2);
    ===================================================================== */
 const T={
  en:{org:'MSM Kochi Branch<small>with CIER</small>',kicker:'the stage awakens…',date:'Sat · 14 Nov 2026',venue:'QLS Panayappilly',cats:'Kids to Teens',
-     reg:'Register now',due:'Entries close 10 November',skip:'Skip intro',sheetT:'Registration opens here',sheetP:'The form (category, items, age check) comes in the next step.',close:'Close',regShort:'Register →',tapClose:'Tap again to close',clickClose:'Click again to close'},
+     reg:'Register now',due:'Entries close 14 November',skip:'Skip intro',sheetT:'Registration opens here',sheetP:'The form (category, items, age check) comes in the next step.',close:'Close',regShort:'Register →',tapClose:'Tap again to close',clickClose:'Click again to close'},
  ml:{org:'MSM കൊച്ചി ശാഖ<small>CIER-നൊപ്പം</small>',kicker:'അരങ്ങുണരുന്നു ഇനി സർഗവസന്തം',date:'നവംബർ 14 ശനി',venue:'QLS പനയപ്പിള്ളി',cats:'കിഡ്സ് മുതൽ ടീൻസ് വരെ',
-     reg:'രജിസ്റ്റർ ചെയ്യൂ',due:'നവംബർ 10-ന് മുമ്പ് എൻട്രി ഉറപ്പാക്കൂ',skip:'സ്കിപ്പ്',sheetT:'രജിസ്ട്രേഷൻ ഇവിടെ',sheetP:'ഫോം (വിഭാഗം, ഇനങ്ങൾ, പ്രായം) അടുത്ത ഘട്ടത്തിൽ.',close:'അടയ്ക്കുക',regShort:'രജിസ്റ്റർ →',tapClose:'അടയ്ക്കാൻ വീണ്ടും തൊടൂ',clickClose:'അടയ്ക്കാൻ വീണ്ടും ക്ലിക്ക് ചെയ്യൂ'}
+     reg:'രജിസ്റ്റർ ചെയ്യൂ',due:'നവംബർ 14-ന് മുമ്പ് എൻട്രി ഉറപ്പാക്കൂ',skip:'സ്കിപ്പ്',sheetT:'രജിസ്ട്രേഷൻ ഇവിടെ',sheetP:'ഫോം (വിഭാഗം, ഇനങ്ങൾ, പ്രായം) അടുത്ത ഘട്ടത്തിൽ.',close:'അടയ്ക്കുക',regShort:'രജിസ്റ്റർ →',tapClose:'അടയ്ക്കാൻ വീണ്ടും തൊടൂ',clickClose:'അടയ്ക്കാൻ വീണ്ടും ക്ലിക്ക് ചെയ്യൂ'}
 };
 const CAT={en:['Kids','Children','Sub-Junior','Junior','Teens'],ml:['കിഡ്സ്','ചിൽഡ്രൻ','സബ്ജൂനിയർ','ജൂനിയർ','ടീൻസ്']};
 let LANG='en';

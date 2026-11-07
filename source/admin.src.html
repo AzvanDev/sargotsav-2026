@@ -432,8 +432,8 @@ function renderOverview(){
   const boys=rows.filter(r=>r.gender==="boy").length;
   $("#tAll").textContent=rows.length;$("#tEntries").textContent=rows.reduce((a,r)=>a+r.items.length,0);
   $("#tDay").textContent=rows.filter(r=>Date.now()-new Date(r.created_at)<864e5).length;$("#tBG").textContent=`${boys} · ${rows.length-boys}`;$("#tIn").textContent=`${rows.filter(r=>r.checked_in_at).length} of ${rows.length}`;
-  const close=new Date("2026-11-10T23:59:59+05:30");const left=Math.ceil((close-Date.now())/864e5);
-  $("#ovSub").textContent=left>0?`Entries close 10 Nov, 11:59 pm · ${left} day${left>1?"s":""} left`:"Entries are closed";
+  const close=new Date("2026-11-14T23:59:59+05:30");const left=Math.ceil((close-Date.now())/864e5);
+  $("#ovSub").textContent=left>0?`Entries close 14 Nov, 11:59 pm · ${left} day${left>1?"s":""} left`:"Entries are closed";
   const max=Math.max(1,...CATS.map(c=>rows.filter(r=>r.category===c[0]).length));
   $("#catBars").innerHTML=CATS.map(([k,n,c])=>{const l=rows.filter(r=>r.category===k),b=l.filter(r=>r.gender==="boy").length,g=l.length-b;
     return `<button type="button" class="catrow" data-cat="${k}" style="--c:${c}"><span class="nm"><i></i>${n}</span>
