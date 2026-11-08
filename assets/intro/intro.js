@@ -25,9 +25,9 @@ const DPR=Math.min(window.devicePixelRatio||1,2);
    COPY
    ===================================================================== */
 const T={
- en:{org:'MSM Kochi Branch<small>with CIER</small>',kicker:'the stage awakens…',date:'Sat · 14 Nov 2026',venue:'QLS Panayappilly',cats:'Kids to Teens',
+ en:{org:'MSM Kochi Unit<small>with CIER</small>',kicker:'the stage awakens…',date:'Sat · 14 Nov 2026',venue:'QLS Panayappilly',cats:'Kids to Teens',
      reg:'Register now',due:'Entries close 14 November',skip:'Skip intro',sheetT:'Registration opens here',sheetP:'The form (category, items, age check) comes in the next step.',close:'Close',regShort:'Register →',tapClose:'Tap again to close',clickClose:'Click again to close'},
- ml:{org:'MSM കൊച്ചി ശാഖ<small>CIER-നൊപ്പം</small>',kicker:'അരങ്ങുണരുന്നു ഇനി സർഗവസന്തം',date:'നവംബർ 14 ശനി',venue:'QLS പനയപ്പിള്ളി',cats:'കിഡ്സ് മുതൽ ടീൻസ് വരെ',
+ ml:{org:'MSM കൊച്ചി യൂണിറ്റ്<small>CIER-നൊപ്പം</small>',kicker:'അരങ്ങുണരുന്നു ഇനി സർഗവസന്തം',date:'നവംബർ 14 ശനി',venue:'QLS പനയപ്പിള്ളി',cats:'കിഡ്സ് മുതൽ ടീൻസ് വരെ',
      reg:'രജിസ്റ്റർ ചെയ്യൂ',due:'നവംബർ 14-ന് മുമ്പ് എൻട്രി ഉറപ്പാക്കൂ',skip:'സ്കിപ്പ്',sheetT:'രജിസ്ട്രേഷൻ ഇവിടെ',sheetP:'ഫോം (വിഭാഗം, ഇനങ്ങൾ, പ്രായം) അടുത്ത ഘട്ടത്തിൽ.',close:'അടയ്ക്കുക',regShort:'രജിസ്റ്റർ →',tapClose:'അടയ്ക്കാൻ വീണ്ടും തൊടൂ',clickClose:'അടയ്ക്കാൻ വീണ്ടും ക്ലിക്ക് ചെയ്യൂ'}
 };
 const CAT={en:['Kids','Children','Sub-Junior','Junior','Teens'],ml:['കിഡ്സ്','ചിൽഡ്രൻ','സബ്ജൂനിയർ','ജൂനിയർ','ടീൻസ്']};
@@ -1202,9 +1202,13 @@ function showTip(d,g,ev){
 function hideTip(){tipFor=null;tipEl.classList.remove('on')}
 
 /* =====================================================================
-   SOUND  (synthesised, opt-in)
+   SOUND  (synthesised, on by default)
+   Browsers keep audio silent until the visitor's first tap, click or key press,
+   so the audio starts at that first gesture (or right away where autoplay is allowed).
+   A visitor who mutes is remembered on this device.
    ===================================================================== */
-let AC=null,soundOn=false,brushNoise=null,penNoise=null;
+let AC=null,soundOn=true,brushNoise=null,penNoise=null;
+try{if(localStorage.getItem('sg-sound')==='off')soundOn=false}catch(e){}
 function noiseBuf(){const b=AC.createBuffer(1,AC.sampleRate*1.5,AC.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b}
 function soundInit(){
   AC=new (window.AudioContext||window.webkitAudioContext)();const nb=noiseBuf();
@@ -1227,9 +1231,18 @@ function sfxUpdate(brushAmt,penAmt){
   brushNoise.g.gain.setTargetAtTime(soundOn?brushAmt*.22:0,t,.03);brushNoise.fl.frequency.setTargetAtTime(600+brushAmt*900,t,.05);
   penNoise.g.gain.setTargetAtTime(soundOn?penAmt*.07:0,t,.02);
 }
+function sndIcon(){$('#snd').setAttribute('aria-pressed',soundOn);
+  $('#sndOn').setAttribute('opacity',soundOn?1:0);$('#sndOff').setAttribute('opacity',soundOn?0:1)}
+function soundWake(){
+  if(!soundOn||CAPTURE)return;
+  try{if(!AC)soundInit();if(AC.state!=='running')AC.resume().catch(()=>{})}catch(e){}
+}
+function soundGesture(){soundWake();if(AC&&AC.state==='running'||!soundOn){['pointerdown','pointerup','touchend','click','keydown'].forEach(ev=>removeEventListener(ev,soundGesture,true))}}
+['pointerdown','pointerup','touchend','click','keydown'].forEach(ev=>addEventListener(ev,soundGesture,true));
+sndIcon();soundWake(); // try autoplay now; most browsers wait for the first gesture
 $('#snd').onclick=()=>{
-  if(!AC)soundInit();AC.resume();soundOn=!soundOn;$('#snd').setAttribute('aria-pressed',soundOn);
-  $('#sndOn').setAttribute('opacity',soundOn?1:0);$('#sndOff').setAttribute('opacity',soundOn?0:1);askTilt();
+  if(!AC)soundInit();AC.resume();soundOn=!soundOn;sndIcon();askTilt();
+  try{localStorage.setItem('sg-sound',soundOn?'on':'off')}catch(e){}
 };
 
 /* =====================================================================
