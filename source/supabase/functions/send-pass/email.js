@@ -20,8 +20,8 @@ const TXT = {
     scan: "Show this QR code at the registration desk. An organiser scans it to mark you present.",
     open: "Open my pass", openHint: "Opens your pass in the browser, where you can save it as an image.",
     keep: "Keep this email. You don't need to print it; the QR on your phone screen is enough.",
-    change: "To change items or for group items, call or WhatsApp 92499 99743 (Sijad K.I) or 81290 90420 (Mayis Mahmood).",
-    foot: "Sargotsav · MSM Kochi Branch · CIER",
+    change: "To change items or for group items, call or WhatsApp 92499 99743 (Sijad K.I) or 81290 90420 (Mayiz Mahmood).",
+    foot: "Sargotsav · MSM Kochi Unit · CIER",
     why: "You got this email because this address was used to register for Sargotsav 2026.",
   },
   ml: {
@@ -37,7 +37,7 @@ const TXT = {
     open: "എന്റെ പാസ് തുറക്കുക", openHint: "ബ്രൗസറിൽ പാസ് തുറക്കും, അവിടെ ചിത്രമായി സേവ് ചെയ്യാം.",
     keep: "ഈ ഇമെയിൽ സൂക്ഷിക്കുക. പ്രിന്റ് എടുക്കേണ്ടതില്ല; ഫോണിലെ QR മതി.",
     change: "ഇനങ്ങൾ മാറ്റാനോ ഗ്രൂപ്പിനങ്ങൾക്കോ 92499 99743 (സിജാദ് കെ.ഐ), 81290 90420 (മായിസ് മഹമൂദ്) എന്നീ നമ്പറുകളിൽ വിളിക്കുക / വാട്‌സ്ആപ്പ് ചെയ്യുക.",
-    foot: "സർഗോത്സവ് · MSM കൊച്ചി ശാഖ · CIER",
+    foot: "സർഗോത്സവ് · MSM കൊച്ചി യൂണിറ്റ് · CIER",
     why: "സർഗോത്സവ് 2026 രജിസ്ട്രേഷന് ഈ ഇമെയിൽ വിലാസം നൽകിയതുകൊണ്ടാണ് ഈ ഇമെയിൽ ലഭിച്ചത്.",
   },
 };

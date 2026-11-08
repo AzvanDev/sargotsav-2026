@@ -1,6 +1,6 @@
-# Sargotsav 2026 · MSM Kochi Branch
+# Sargotsav 2026 · MSM Kochi Unit
 
-Website for Sargotsav 2026, the arts festival of MSM Kochi Branch with CIER.
+Website for Sargotsav 2026, the arts festival of MSM Kochi Unit with CIER.
 Saturday 14 November 2026, QLS Panayappilly. Entries close 14 November.
 
 ## Pages
@@ -55,4 +55,4 @@ source/intro/         landing page source and build script
 - Sign in to the check-in desk on each organiser phone before the day starts, while the internet works.
 - Each pass can be emailed at most 5 times, at least a minute apart. A failed send is recorded in `registrations.email_error`.
 
-Contact: 92499 99743 (Sijad K.I), 8129090420 (Mayis Mahmood).
+Contact: 92499 99743 (Sijad K.I), 8129090420 (Mayiz Mahmood).
