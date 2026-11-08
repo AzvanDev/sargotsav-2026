@@ -1233,15 +1233,17 @@ function sfxUpdate(brushAmt,penAmt){
 }
 function sndIcon(){$('#snd').setAttribute('aria-pressed',soundOn);
   $('#sndOn').setAttribute('opacity',soundOn?1:0);$('#sndOff').setAttribute('opacity',soundOn?0:1)}
+function sndWait(){$('#snd').classList.toggle('wait',soundOn&&!(AC&&AC.state==='running'))}
 function soundWake(){
   if(!soundOn||CAPTURE)return;
-  try{if(!AC)soundInit();if(AC.state!=='running')AC.resume().catch(()=>{})}catch(e){}
+  try{if(!AC){soundInit();AC.onstatechange=sndWait}if(AC.state!=='running')AC.resume().catch(()=>{})}catch(e){}
+  sndWait();
 }
 function soundGesture(){soundWake();if(AC&&AC.state==='running'||!soundOn){['pointerdown','pointerup','touchend','click','keydown'].forEach(ev=>removeEventListener(ev,soundGesture,true))}}
 ['pointerdown','pointerup','touchend','click','keydown'].forEach(ev=>addEventListener(ev,soundGesture,true));
 sndIcon();soundWake(); // try autoplay now; most browsers wait for the first gesture
 $('#snd').onclick=()=>{
-  if(!AC)soundInit();AC.resume();soundOn=!soundOn;sndIcon();askTilt();
+  if(!AC)soundInit();AC.resume();soundOn=!soundOn;sndIcon();sndWait();askTilt();
   try{localStorage.setItem('sg-sound',soundOn?'on':'off')}catch(e){}
 };
 
