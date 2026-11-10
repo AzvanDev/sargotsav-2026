@@ -81,6 +81,17 @@ button{cursor:pointer}
 
 .manual{display:flex;gap:8px}
 .manual .search{flex:1;min-width:0}
+.find{display:grid;gap:8px}
+.matches{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.matches button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;min-height:52px}
+.matches button:hover,.matches button:focus-visible{border-color:var(--ink)}
+.matches .mn{flex:1;min-width:0;display:grid;line-height:1.2}
+.matches .mn b{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.matches .mn small{color:var(--muted);font-size:.8rem}
+.matches .st{font-size:.78rem;font-weight:800;border-radius:999px;padding:2px 9px;white-space:nowrap;background:#eef0f6;color:#3d4670}
+.matches .st.in{background:#e6f2e8;color:#1f5f2b}
+.matches mark{background:#ffe9a8;color:inherit;border-radius:3px;padding:0 1px}
+.matches .none{color:var(--muted);font-size:.9rem;padding:4px 2px}
 
 /* result card */
 .res{background:var(--desk);border:2px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:6px 6px 0 var(--ink)}
@@ -195,10 +206,13 @@ button{cursor:pointer}
       <label class="toggle"><input type="checkbox" id="quick"> Mark present as soon as scanned</label>
     </div>
 
-    <form class="manual" id="manual" autocomplete="off">
-      <input class="search" id="code" inputmode="numeric" placeholder="Or type a reg. no., e.g. 42" aria-label="Registration number">
-      <button class="btn" type="submit">Find</button>
-    </form>
+    <div class="find">
+      <form class="manual" id="manual" autocomplete="off" role="search">
+        <input class="search" id="code" type="search" enterkeyhint="search" autocapitalize="words" spellcheck="false" placeholder="Reg. no. or name, e.g. 42 or Ayisha" aria-label="Find by registration number or name" aria-controls="matches">
+        <button class="btn" type="submit">Find</button>
+      </form>
+      <ul class="matches" id="matches" aria-label="Matching contestants" hidden></ul>
+    </div>
 
     <div id="result" aria-live="assertive"></div>
 
@@ -406,7 +420,7 @@ function showPerson(r,state){
   if(state==="dup")resumeLater();
 }
 function wireNext(){document.querySelectorAll("[data-next]").forEach(b=>b.onclick=clearResult)}
-function clearResult(){shown=null;$("#result").innerHTML="";document.body.classList.remove("has-res");$("#code").value="";if(stream)resumeScan()}
+function clearResult(){shown=null;$("#result").innerHTML="";document.body.classList.remove("has-res");$("#code").value="";$("#matches").hidden=true;if(stream)resumeScan()}
 function resumeLater(){if(stream)setTimeout(()=>{if(stream&&!scanning)resumeScan(true)},1200)}
 function renderRecent(){
   $("#recentBox").hidden=!recent.length;
@@ -415,8 +429,43 @@ function renderRecent(){
 function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 const quickBox=$("#quick");quickBox.checked=ls.get("sg_ci_quick",false);quickBox.onchange=()=>ls.set("sg_ci_quick",quickBox.checked);
 
+/* ---------- find by reg. no. or name (from the list on this phone, so it works offline) ---------- */
+const norm=t=>String(t||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\u0d00-\u0d7f ]+/g," ").replace(/\s+/g," ").trim();
+function search(q){
+  const n=norm(q);if(!n)return [];
+  const digits=/^(sgv)?\s*\d{1,5}$/.test(n.replace(/-/g,""))?String(parseInt(n.replace(/\D/g,""),10)):null;
+  const words=n.split(" ");
+  const out=[];
+  for(const r of roster.values()){
+    let score=0;
+    if(digits){const num=String(parseInt(r.reg_no.replace(/\D/g,""),10));if(num===digits)score=100;else if(num.startsWith(digits))score=40;else if(r.phone&&r.phone.endsWith(digits)&&digits.length>=4)score=30}
+    else{const nm=norm(r.name);if(words.every(w=>nm.includes(w))){score=10+(nm.startsWith(words[0])?20:0)+(nm.split(" ").some(p=>p.startsWith(words[0]))?10:0)}}
+    if(score)out.push([score,r]);
+  }
+  return out.sort((a,b)=>b[0]-a[0]||a[1].name.localeCompare(b[1].name)).slice(0,8).map(x=>x[1]);
+}
+function hi(name,q){const ws=norm(q).split(" ").filter(w=>w&&!/^\d+$/.test(w));let h=esc(name);
+  for(const w of ws){const re=new RegExp("("+w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")","ig");h=h.replace(re,"<mark>$1</mark>")}return h}
+function renderMatches(){
+  const q=$("#code").value.trim(),ul=$("#matches");
+  if(!q||(/^\d{1,2}$/.test(q))){ul.hidden=true;ul.innerHTML="";return} // 1–2 digits: wait for Find, too many partial hits
+  const list=search(q);ul.hidden=false;
+  ul.innerHTML=list.length?list.map(r=>`<li><button type="button" data-id="${esc(r.id)}"><span class="reg num">${esc(r.reg_no.replace("SGV-",""))}</span>
+    <span class="mn"><b>${hi(r.name,q)}</b><small>${esc(div(r))}${r.phone?" · ••"+esc(r.phone.slice(-4)):""}</small></span>
+    <span class="st${r.checked_in_at?" in":""}">${r.checked_in_at?"✓ In":"Not yet"}</span></button></li>`).join("")
+    :`<li class="none">${roster.size?"No one matches. Check the spelling, or try the reg. no.":"The contestant list hasn't loaded yet. Connect to the internet once."}</li>`;
+  ul.querySelectorAll("button[data-id]").forEach(b=>b.onclick=()=>pick(roster.get(b.dataset.id)));
+}
+function pick(r){if(!r)return;$("#matches").hidden=true;$("#code").blur();scanning=false;buzz(30);
+  if(!r.checked_in_at&&$("#quick").checked){mark(r,false);return}
+  showPerson(r,null);$("#result").scrollIntoView({behavior:"smooth",block:"start"})}
+$("#code").addEventListener("input",renderMatches);
 $("#manual").addEventListener("submit",e=>{e.preventDefault();const v=$("#code").value.trim();if(!v)return;
-  const c=codeFrom(v);if(!c){showNotFound(v);return}$("#code").blur();lookup(c,false)});
+  const c=codeFrom(v);
+  if(c){$("#matches").hidden=true;$("#code").blur();lookup(c,false);return}
+  const list=search(v);
+  if(list.length===1){pick(list[0]);return}
+  renderMatches()});
 
 /* ---------- camera ---------- */
 // Android Chrome has a built-in QR reader (BarcodeDetector): fast and light. iPhones use jsQR on a
